@@ -17,7 +17,7 @@ jobs:
     name: Build and publish the single-file release
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
 
@@ -39,7 +39,7 @@ jobs:
           if ("v$exeVersion" -ne $tag) { throw "Tag $tag does not match the built version $exeVersion (Cargo.toml)." }
 
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           name: Predator Remote Controller ${{ github.event.inputs.tag || github.ref_name }}
