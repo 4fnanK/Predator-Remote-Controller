@@ -189,7 +189,7 @@ fn update(io: &mut dyn Io, env: &mut dyn MenuEnv) -> Result<(), String> {
 fn uninstall(io: &mut dyn Io, env: &mut dyn MenuEnv) -> Result<bool, String> {
     io.say("  This removes the service, the tray icon and its autostart and the program files, and");
     io.say("  restores the original logon audit policy.");
-    if ask_yes_no(io, "  Uninstall Predator Remote Controller?", false) != Some(true) {
+    if ask_yes_no(io, "  Uninstall Vigil?", false) != Some(true) {
         return Ok(false);
     }
     let Some(purge) = ask_yes_no(
@@ -200,11 +200,11 @@ fn uninstall(io: &mut dyn Io, env: &mut dyn MenuEnv) -> Result<bool, String> {
         return Ok(false);
     };
     match env.uninstall(purge)? {
-        None => io.say("  Predator Remote Controller was removed."),
+        None => io.say("  Vigil was removed."),
         // The service is gone, so the menu (which manages it) ends either way.
         Some(problem) => {
             io.say(&format!("  WARNING: {problem}"));
-            io.say("  Predator Remote Controller was removed, but see the warning above.");
+            io.say("  Vigil was removed, but see the warning above.");
         }
     }
     Ok(true)

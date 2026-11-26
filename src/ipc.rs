@@ -12,7 +12,7 @@
 //!   Admin accounts and `RemoveUser` additionally need LocalSystem or elevation (`Error`
 //!   otherwise): every unelevated process of the owner's session has the owner SID.
 //! * Client verifies the server: `GetNamedPipeServerProcessId` must equal the PID the SCM reports
-//!   for the Predator service (prevents pipe squatting by another process).
+//!   for the Vigil service (prevents pipe squatting by another process).
 //!
 //! Compatibility: variants and fields are only ever added (older trays and CLIs keep working
 //! with a newer service, and an older service answers a request it does not know with `Error`).
@@ -34,7 +34,7 @@ pub enum IpcRequest {
     SetFeature { feature: String, enabled: bool },
     /// Refresh and return Tailscale status (spawns the Tailscale CLI).
     TailscaleStatus,
-    /// Restart the Predator service (performed by a detached SYSTEM helper).
+    /// Restart the Vigil service (performed by a detached SYSTEM helper).
     RestartService,
     /// Re-read `settings.json` (sent by CLI commands that edited it while the service runs).
     ReloadSettings,
@@ -247,7 +247,7 @@ pub enum IpcResponse {
 }
 
 /// Send one request to the service and wait for the reply (client side, used by the tray).
-/// Verifies the pipe server is the real Predator service process.
+/// Verifies the pipe server is the real Vigil service process.
 pub fn request(req: &IpcRequest, timeout: Duration) -> Result<IpcResponse, String> {
     crate::service::pipe::client_request(
         crate::paths::PIPE_NAME,

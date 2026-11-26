@@ -1,10 +1,10 @@
-# Predator Remote Controller
+# Vigil
 
-[![CI](https://github.com/4fnanK/Predator-Remote-Controller/actions/workflows/ci.yml/badge.svg)](https://github.com/4fnanK/Predator-Remote-Controller/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/4fnanK/Predator-Remote-Controller)](https://github.com/4fnanK/Predator-Remote-Controller/releases/latest)
+[![CI](https://github.com/4fnanK/Vigil/actions/workflows/ci.yml/badge.svg)](https://github.com/4fnanK/Vigil/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/4fnanK/Vigil)](https://github.com/4fnanK/Vigil/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Watch and control your Windows PC from a private Telegram bot. Predator Remote Controller is a
+Watch and control your Windows PC from a private Telegram bot. Vigil is a
 small native Windows service, written in Rust and shipped as one ~2.6 MB file. It sends you an
 instant Telegram alert when someone signs in to the PC, whether at the keyboard, over Remote
 Desktop or over SSH. From your phone you can then check the PC, lock it, shut it down, and, most
@@ -79,11 +79,11 @@ network (your *tailnet*) under a stable address, such as `100.64.0.5` or the Mag
 data, hotel Wi-Fi or another office's network. You do not need port forwarding on the router, and
 Remote Desktop and SSH are never exposed to the internet.
 
-Predator turns Tailscale into a switch you can flip from your phone. Starting Tailscale from
+Vigil turns Tailscale into a switch you can flip from your phone. Starting Tailscale from
 Telegram is the main reason the bot exists:
 
 1. When you need the PC, tap **🛡 Tailscale → ▶️ Up**, or send `/tailscale up`.
-2. Predator then does the following:
+2. Vigil then does the following:
    - starts the `Tailscale` Windows service;
    - starts the Tailscale app (`tailscale-ipn.exe`) in the signed-in user's session if it is not
      running;
@@ -91,7 +91,7 @@ Telegram is the main reason the bot exists:
      settings unchanged;
    - replies with every step and the PC's Tailscale IP.
 3. Connect with **Remote Desktop** or **SSH** to that address.
-4. When you are done, tap **⏹ Down**, or send `/tailscale down`. Predator then:
+4. When you are done, tap **⏹ Down**, or send `/tailscale down`. Vigil then:
    - disconnects;
    - closes the Tailscale app;
    - stops the Tailscale service and checks that `tailscaled.exe` has exited.
@@ -133,11 +133,11 @@ In the Tailscale app, choose **Preferences → Run unattended**.
 ### Before the first Up
 
 - Install [Tailscale for Windows](https://tailscale.com/download/windows) and sign in once on the
-  PC. Predator never signs in for you.
+  PC. Vigil never signs in for you.
   - If Tailscale still needs a login, the bot shows the login link. Whoever opens that link binds
     the PC to *their* tailnet, so only open it yourself.
   - If your tailnet requires device approval, approve the PC in the Tailscale admin console.
-- At the end of the setup, Predator checks Tailscale and tells you what is missing. The setup only
+- At the end of the setup, Vigil checks Tailscale and tells you what is missing. The setup only
   reads the Tailscale status; it never runs Up or Down.
 - Down stops the Tailscale service for every user of the PC. It does not change the service's
   startup type, so Tailscale normally starts with Windows again after a reboot.
@@ -158,29 +158,29 @@ In the Tailscale app, choose **Preferences → Run unattended**.
 
 ### 1. Download and check the file
 
-Open the [latest release](https://github.com/4fnanK/Predator-Remote-Controller/releases/latest)
+Open the [latest release](https://github.com/4fnanK/Vigil/releases/latest)
 and download both files:
 
 | File | What it is |
 |---|---|
-| `PredatorRemoteController.exe` | The whole program in one file: service, setup and tray icon |
+| `Vigil.exe` | The whole program in one file: service, setup and tray icon |
 | `SHA256SUMS.txt` | SHA-256 checksums of the release files |
 
 Check the download in PowerShell:
 
 ```powershell
 cd $HOME\Downloads
-Get-FileHash .\PredatorRemoteController.exe -Algorithm SHA256
+Get-FileHash .\Vigil.exe -Algorithm SHA256
 Get-Content .\SHA256SUMS.txt
 ```
 
-The hash must equal the one on the `PredatorRemoteController.exe` line of `SHA256SUMS.txt`
+The hash must equal the one on the `Vigil.exe` line of `SHA256SUMS.txt`
 (upper or lower case does not matter). You can also compare them in one step; `True` means the file
 is intact:
 
 ```powershell
 $expected = ((Select-String -Path .\SHA256SUMS.txt -Pattern 'PredatorRemoteController\.exe').Line -split '\s+')[0]
-(Get-FileHash .\PredatorRemoteController.exe -Algorithm SHA256).Hash -eq $expected
+(Get-FileHash .\Vigil.exe -Algorithm SHA256).Hash -eq $expected
 ```
 
 > **Windows SmartScreen.** The program is not code-signed, so Windows may show *"Windows protected
@@ -200,7 +200,7 @@ The full guide, including how to replace a token that leaked, is in
 
 ### 3. Run the setup
 
-Double-click `PredatorRemoteController.exe`. It asks for administrator rights with the usual
+Double-click `Vigil.exe`. It asks for administrator rights with the usual
 User Account Control (UAC) prompt and then continues in a new console window. If you decline the
 prompt, nothing on the PC is changed.
 
@@ -209,7 +209,7 @@ six steps:
 
 | Step | What happens |
 |---|---|
-| **[1/6] Telegram bot token** | Shows a short BotFather guide and asks for the token. Your typing is hidden. Predator checks the token with Telegram and shows the bot it belongs to, for example `OK - this is the token of @YourPcBot (Your PC)`. You get up to 5 attempts, and pressing Enter alone cancels. If a token from an earlier installation is still stored, you are asked whether to keep it. |
+| **[1/6] Telegram bot token** | Shows a short BotFather guide and asks for the token. Your typing is hidden. Vigil checks the token with Telegram and shows the bot it belongs to, for example `OK - this is the token of @YourPcBot (Your PC)`. You get up to 5 attempts, and pressing Enter alone cancels. If a token from an earlier installation is still stored, you are asked whether to keep it. |
 | **[2/6] Protected data folder** | Creates `%ProgramData%\Predator`, which only SYSTEM and Administrators can open, and stores the token there, encrypted with Windows DPAPI. An existing folder that cannot be trusted is moved aside and never used. |
 | **[3/6] Link your Telegram account** | Shows a one-time pairing code and a link (see below). The account that uses it becomes the first **Admin**. If pairing fails, you can try again or continue without an account and pair later from the menu. If accounts from an earlier installation are still there, you are asked whether to pair another one. |
 | **[4/6] Program files** | Copies the program to `C:\Program Files\Predator\predator-service.exe` and writes the tray program `predator-tray.exe`, which is built into the file, next to it. Both files are checked with SHA-256. Only administrators can change that folder. |
@@ -263,11 +263,11 @@ the program again, and it continues where it stopped.
 only the token, and your numeric Telegram user ID:
 
 ```powershell
-.\PredatorRemoteController.exe setup --token-file C:\path\token.txt --telegram-id 123456789 --yes
+.\Vigil.exe setup --token-file C:\path\token.txt --telegram-id 123456789 --yes
 ```
 
 Delete the token file afterwards. With `--yes` the setup never asks a question. On a PC where
-Predator is already installed, the same command updates the program to this version and applies
+Vigil is already installed, the same command updates the program to this version and applies
 the given token and user.
 
 ### 4. First steps in Telegram
@@ -282,12 +282,12 @@ the given token and user.
 
 ## Management menu
 
-Start `PredatorRemoteController.exe` again (or `C:\Program Files\Predator\predator-service.exe`)
-and confirm the UAC prompt. On a PC where Predator is already installed, you get this menu instead
+Start `Vigil.exe` again (or `C:\Program Files\Predator\predator-service.exe`)
+and confirm the UAC prompt. On a PC where Vigil is already installed, you get this menu instead
 of the setup:
 
 ```
-Predator Remote Controller 1.0.0 - installed
+Vigil 1.0.0 - installed
   Service: Running | Bot: @YourPcBot | Telegram users: 2
   Installed in C:\Program Files\Predator (version 1.0.0)
 
@@ -308,12 +308,12 @@ Predator Remote Controller 1.0.0 - installed
 | **4 Change bot token** | Asks for a new token, checks it with Telegram and stores it encrypted. If the service is running, offers to restart it so it uses the new token. Paired users stay paired. If the new token belongs to a **different** bot, everybody must open the new bot and tap **Start** once, or Telegram cannot deliver its messages. |
 | **5 Update installed program to this version (x.y.z)** | Only shown when the file you started differs from the installed one, for example a newer download. See [Updating](#updating). |
 | **6 Open the bot in Telegram** | Opens `https://t.me/YourPcBot` in your browser. |
-| **7 Uninstall** | Asks for confirmation, then removes Predator. See [Uninstalling](#uninstalling). |
+| **7 Uninstall** | Asks for confirmation, then removes Vigil. See [Uninstalling](#uninstalling). |
 | **0 Exit** | Closes the menu (`q` and `exit` work too). |
 
 ### Updating
 
-Download the new `PredatorRemoteController.exe`, start it and choose
+Download the new `Vigil.exe`, start it and choose
 **5 Update installed program to this version**. The update then:
 
 1. copies the new files next to the old ones and checks them;
@@ -327,7 +327,7 @@ is not touched.
 
 ### Uninstalling
 
-**7 Uninstall** first asks `Uninstall Predator Remote Controller? [y/N]`, then
+**7 Uninstall** first asks `Uninstall Vigil? [y/N]`, then
 `Also delete the data folder (bot token, Telegram users, settings, logs)? [y/N]`.
 
 It removes:
@@ -342,7 +342,7 @@ It keeps:
 
 - the data folder `%ProgramData%\Predator`, unless you chose to delete it. It holds the token,
   users, settings, history and logs, so you can reinstall later without pairing again;
-- the downloaded `PredatorRemoteController.exe`;
+- the downloaded `Vigil.exe`;
 - any `%ProgramData%\Predator.untrusted-*` folder that the setup moved aside. Delete it yourself
   when you no longer need it;
 - everything else on the PC: Tailscale, OpenSSH, the Remote Desktop settings and all other
@@ -405,7 +405,7 @@ If a feature is switched off, its commands and buttons reply with, for example,
 ### Main menu (`/menu`)
 
 ```
-🖥 PREDATOR REMOTE CONTROL
+🖥 VIGIL REMOTE CONTROL
 ━━━━━━━━━━━━━━━━━━
 🟢 Online · DESKTOP-01
 ⏱ Uptime: 3h 12m · Service: 3h 11m
@@ -579,10 +579,10 @@ screen has one button, **[⬅️ Back]**.
   offline. The bot replies, for example,
   `⌛ Ignored /lock sent at 14:02:11 — older than 5 minutes (sent while the PC was offline?)`.
 - **Late button presses.** A button press carries no time stamp. Telegram may deliver presses it
-  kept while Predator was not listening, that is, in the first batch after a start or after more
+  kept while Vigil was not listening, that is, in the first batch after a start or after more
   than 90 seconds without contact. Such presses are not carried out if they would change
   something: power, Confirm, lock, logout, Tailscale Up/Down, feature switches or removing a user.
-  The message changes to `⌛ Ignored a button press that was queued while PREDATOR was offline.
+  The message changes to `⌛ Ignored a button press that was queued while Vigil was offline.
   Press it again if you still want this.` and offers the button again. Navigation buttons and
   Cancel keep working as usual.
 
@@ -633,9 +633,9 @@ An alert that was delivered more than a minute after its event gets a note such 
 
 | Notice | When |
 |---|---|
-| 🟢 PREDATOR ONLINE | The service started, with its version and the boot time |
-| 🔴 PREDATOR GOING OFFLINE | The service is stopping, with the reason (*System shutdown* or *Service stopped*) and its uptime |
-| ☀️ PREDATOR RESUMED | The PC woke up from sleep or hibernation |
+| 🟢 VIGIL ONLINE | The service started, with its version and the boot time |
+| 🔴 VIGIL GOING OFFLINE | The service is stopping, with the reason (*System shutdown* or *Service stopped*) and its uptime |
+| ☀️ VIGIL RESUMED | The PC woke up from sleep or hibernation |
 | ⚙️ FEATURE CHANGED | A feature was switched from the tray icon or the command line |
 | ⚠️ AUDIT POLICY INSUFFICIENT | The Windows logon audit policy no longer records what login alerts need. The notice tells you how to fix it. |
 | ⚠️ LOGIN MONITOR GAP | An event log was cleared or rolled over while it was not being read, so some events may be missing |
@@ -644,7 +644,7 @@ The online, offline and resumed notices can be turned off with `lifecycle_notifi
 [Settings](#settings)). For example:
 
 ```
-🟢 PREDATOR ONLINE
+🟢 VIGIL ONLINE
 
 Computer: DESKTOP-01
 Event: Service started
@@ -679,7 +679,7 @@ Messages are deleted:
 Each account has its own chat with the bot, and cleaning one chat never touches another.
 
 Telegram does not let bots delete messages older than 48 hours, so older ones stay. Messages from
-before Predator was installed are not known to it; clear them once with Telegram's
+before Vigil was installed are not known to it; clear them once with Telegram's
 **Clear history**. To turn the feature off, set `auto_clean_chat` to `false`.
 
 ---
@@ -692,7 +692,7 @@ before Predator was installed are not known to it; clear them once with Telegram
   *delivered late* note.
 - At worst an alert can arrive twice after a crash. It is never lost.
 - The queue holds at most 1000 alerts; beyond that, the oldest are dropped.
-- A network change or a wake-up from sleep makes Predator reconnect at once.
+- A network change or a wake-up from sleep makes Vigil reconnect at once.
 - Commands and button presses that Telegram kept while the PC was offline are handled as described
   in [Late commands and button presses](#late-commands-and-button-presses). Read-only commands
   are still answered.
@@ -722,7 +722,7 @@ one in three places:
 |---|---|---|
 | Tray icon | **Pair Telegram User…**. A window shows the code and a link, and a notification appears when the account has paired. | User. The first account of an empty list becomes Admin. |
 | Management menu | **2 Pair a Telegram user**. You are asked whether the account should be an Admin. | Admin or User |
-| Command line (elevated) | `PredatorRemoteController.exe pair [--admin] [--ttl SECS]`, or the installed `predator-service.exe pair …` | Admin with `--admin`, otherwise User |
+| Command line (elevated) | `Vigil.exe pair [--admin] [--ttl SECS]`, or the installed `predator-service.exe pair …` | Admin with `--admin`, otherwise User |
 
 On their own phone, the new person then does one of two things:
 
@@ -796,7 +796,7 @@ service is stopped, those items are greyed out.
 
 ## Command-line reference
 
-`PredatorRemoteController.exe` and the installed `C:\Program Files\Predator\predator-service.exe`
+`Vigil.exe` and the installed `C:\Program Files\Predator\predator-service.exe`
 are the same program. Started without arguments, it opens the setup or the management menu.
 Started with a command, it works as a management tool. The commands marked *Administrator* need
 an elevated PowerShell and say so when they do not have it. Run `help` for the full usage text.
@@ -840,7 +840,7 @@ then `start`, or use **Restart Service** in the tray menu.
 | `features` | see [Features screen](#features-screen) | On/off state of the nine features. Easier to change with `/features`, the tray icon or `features enable/disable`. |
 | `stale_command_secs` | `300` | Commands that change something and are older than this many seconds are ignored |
 | `confirm_timeout_secs` | `60` | How long a shutdown, restart, sleep or hibernate confirmation stays valid |
-| `lifecycle_notifications` | `true` | Send the PREDATOR ONLINE, GOING OFFLINE and RESUMED notices |
+| `lifecycle_notifications` | `true` | Send the VIGIL ONLINE, GOING OFFLINE and RESUMED notices |
 | `auto_clean_chat` | `true` | Delete short-lived chat messages automatically. With `false`, nothing is deleted and `/clear` only says that cleaning is off. |
 | `chat_clean_after_secs` | `600` | Seconds without use before a short-lived message is deleted. Values are limited to 60 seconds … 47 hours. |
 | `dry_run` | `false` | Only simulate power, lock, logout and Tailscale Up/Down. Read when the service starts. An empty file named `DRY_RUN` in the data folder does the same. |
@@ -880,7 +880,7 @@ A complete file looks like this:
 
 The bot token is never stored in this file.
 
-**Advanced: HTTPS transport.** Predator normally talks to Telegram over its own direct HTTPS
+**Advanced: HTTPS transport.** Vigil normally talks to Telegram over its own direct HTTPS
 connection, and uses WinHTTP only when a machine-wide proxy is configured or turns out to be
 needed. The environment variable `PREDATOR_HTTP_TRANSPORT` (`direct`, `winhttp` or `auto`) forces
 the choice. See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
@@ -925,7 +925,7 @@ a Windows 11 x64 PC: 10 minutes at idle, both login monitors active, Telegram on
 | CPU | effectively 0 %: under one 15.6 ms timer tick of CPU time in 10 minutes | effectively 0 % |
 | Threads | 7–10 | 1–4 |
 | Handles | ≈ 245 | — |
-| File size | `PredatorRemoteController.exe` ≈ 2.6 MB, including the tray | ≈ 0.5 MB |
+| File size | `Vigil.exe` ≈ 2.6 MB, including the tray | ≈ 0.5 MB |
 
 The numbers on your PC depend on the hardware, the Windows build and the other software.
 `scripts\measure.ps1` measures the installed service and tray icon on your own PC: CPU, memory,
@@ -937,7 +937,7 @@ How it stays this small:
   on event-log signals, on an event or on the local pipe. Apart from the long poll, no periodic
   timer runs more often than once a minute.
 - **Event-log subscriptions with bookmarks.** Windows signals new Security and OpenSSH events, and
-  Predator reads only the logs that were signalled. Saved bookmarks let it pick up where it
+  Vigil reads only the logs that were signalled. Saved bookmarks let it pick up where it
   stopped after a restart.
 - **One long poll over Windows' own TLS.** A single 50-second `getUpdates` long poll runs over a
   direct TCP connection with Windows SChannel (TLS 1.2/1.3) and HTTP/1.1 keep-alive. There is no
@@ -964,7 +964,7 @@ How it stays this small:
 
 ## Security
 
-Predator runs as **LocalSystem** and can shut down the PC, so it is built defensively:
+Vigil runs as **LocalSystem** and can shut down the PC, so it is built defensively:
 
 - **Who can give commands.** Only Telegram accounts paired with a code created on the PC itself,
   recognised by their numeric user ID, never by username, and only in private chats.
@@ -976,7 +976,7 @@ Predator runs as **LocalSystem** and can shut down the PC, so it is built defens
 - **The bot token** is encrypted with DPAPI in a folder that only SYSTEM and Administrators can
   open, and it is never written to a log.
 - **The connection to Telegram** uses TLS 1.2/1.3 through Windows SChannel, with full certificate
-  and host-name checks. Predator listens on no network port.
+  and host-name checks. Vigil listens on no network port.
 - **The local connection with the tray icon** is a named pipe. Every request is checked against
   the caller's Windows account (SID), and the tray icon makes sure it is talking to the real
   service.
@@ -995,13 +995,13 @@ You need Windows 10/11 x64, [Rust](https://rustup.rs) (stable, MSVC toolchain, 1
 Visual Studio Build Tools with the *Desktop development with C++* workload.
 
 ```powershell
-git clone https://github.com/4fnanK/Predator-Remote-Controller.git
-cd Predator-Remote-Controller
+git clone https://github.com/4fnanK/Vigil.git
+cd Vigil
 .\scripts\build.ps1
 ```
 
 `build.ps1` checks the formatting, builds, runs the tests and clippy, and writes
-`dist\PredatorRemoteController.exe` and `dist\SHA256SUMS.txt`. The full guide is in
+`dist\Vigil.exe` and `dist\SHA256SUMS.txt`. The full guide is in
 [docs/BUILDING.md](docs/BUILDING.md). It covers the two-stage build that puts the tray inside the
 release file, console mode for testing without touching the PC, the test and measurement scripts,
 and how releases are made.

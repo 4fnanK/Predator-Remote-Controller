@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Checks, tests and builds Predator Remote Controller and assembles the single-file release.
+    Checks, tests and builds Vigil and assembles the single-file release.
 
 .DESCRIPTION
     Runs, in order, stopping at the first failure:
@@ -13,7 +13,7 @@
       6. cargo build --release --target x86_64-pc-windows-msvc --bin predator-service --features embed-tray
          (with PREDATOR_EMBED_TRAY = the tray from step 5, which is embedded into the service exe)
     Then it writes the release folder (default .\dist):
-      PredatorRemoteController.exe   the whole program in one file (service + setup + embedded tray)
+      Vigil.exe   the whole program in one file (service + setup + embedded tray)
       SHA256SUMS.txt                 SHA-256 of every file in the folder
       README.md, LICENSE             copied from the repository
     and verifies the result: the exe runs 'version', and the tray it extracts with the hidden
@@ -46,7 +46,7 @@ $PSNativeCommandUseErrorActionPreference = $false
 
 $Target = 'x86_64-pc-windows-msvc'
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$ReleaseExe = 'PredatorRemoteController.exe'
+$ReleaseExe = 'Vigil.exe'
 $EmbedVar = 'PREDATOR_EMBED_TRAY'
 
 function Write-Step([string]$Message) {
@@ -207,7 +207,7 @@ function Invoke-CargoStep([string]$Cargo, $Step, [int]$Index, [int]$Count) {
 
 function Invoke-Build {
     $cargo = Get-CargoPath
-    Write-Host "Predator build - repo: $RepoRoot"
+    Write-Host "Vigil build - repo: $RepoRoot"
     Write-Host "cargo: $cargo"
     $info = Get-CargoInfo $cargo
     $releaseDir = Join-Path $info.TargetDir "$Target\release"

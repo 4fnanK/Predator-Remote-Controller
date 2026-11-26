@@ -73,7 +73,7 @@ pub(crate) fn check_program_files(exe_dir: &Path) -> Result<(), String> {
     let me = winsec::current_process_facts().map(|f| f.sid);
     let hint = format!(
         "A LocalSystem service must not run from a location other accounts can change. Start \
-         PredatorRemoteController.exe without arguments (setup copies and protects the files in {}), or copy \
+         Vigil.exe without arguments (setup copies and protects the files in {}), or copy \
          both executables to a folder only administrators can modify and run 'install' from there.",
         crate::paths::DEFAULT_INSTALL_DIR
     );
@@ -95,7 +95,7 @@ pub(crate) fn check_program_files(exe_dir: &Path) -> Result<(), String> {
         .collect();
     if !modules.is_empty() {
         return Err(format!(
-            "{} contains files that Windows would load into the service ({}). Predator ships no such files; \
+            "{} contains files that Windows would load into the service ({}). Vigil ships no such files; \
              delete them (setup removes them) and run install again.",
             exe_dir.display(),
             modules.join(", ")
@@ -485,7 +485,7 @@ fn uninstall_inner(
             println!("Data directory {} does not exist.", root.display());
         } else if !looks_like_data_dir(root) {
             return Err(format!(
-                "Refusing to delete {}: it does not look like a Predator data directory.",
+                "Refusing to delete {}: it does not look like a Vigil data directory.",
                 root.display()
             ));
         } else if audit_failure.is_some() && backup.exists() {

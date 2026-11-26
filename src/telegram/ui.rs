@@ -42,9 +42,9 @@ pub const UNKNOWN_COMMAND: &str = "❓ Unknown command. Send /help for the list.
 /// Reply when a Tailscale up/down is already running.
 pub const TAILSCALE_BUSY: &str = "⏳ A Tailscale operation is already running.";
 /// Shown instead of running a state-changing button press that Telegram delivered from its
-/// backlog (pressed while PREDATOR was offline / not polling).
+/// backlog (pressed while Vigil was offline / not polling).
 pub const BACKLOG_IGNORED: &str =
-    "⌛ Ignored a button press that was queued while PREDATOR was offline. Press it again if you still want this.";
+    "⌛ Ignored a button press that was queued while Vigil was offline. Press it again if you still want this.";
 /// The scope of the Power Management feature (every action it gates).
 pub const POWER_MANAGEMENT_SCOPE: &str = "shutdown, restart, sleep, hibernate, lock and logout";
 /// Reply to a pairing code (`/pair CODE`, `/start pair-CODE`) from an account that is paired.
@@ -53,7 +53,7 @@ pub const ALREADY_PAIRED: &str = "ℹ️ You are already paired.";
 pub const ONLY_ADMINS: &str = "Only admins can remove users.";
 /// Callback alert for an admin pressing remove on their own entry.
 pub const CANNOT_REMOVE_SELF: &str = "You cannot remove your own account here. Ask another admin, or remove it on the PC \
-     (PredatorRemoteController.exe → Telegram users, or 'predator-service users remove ID').";
+     (Vigil.exe → Telegram users, or 'predator-service users remove ID').";
 /// How a new account is added (help, user list, `/pair` from a paired account).
 pub const HOW_TO_PAIR: &str = "To add a Telegram account, start pairing on the PC (tray menu <b>Pair Telegram \
                                User…</b> or the setup menu), then send <code>/pair CODE</code> from the new account \
@@ -333,7 +333,7 @@ pub fn main_keyboard() -> InlineKeyboardMarkup {
 
 pub fn main_menu(v: &MenuView) -> Screen {
     let mut s = String::with_capacity(400);
-    s.push_str("🖥 <b>PREDATOR REMOTE CONTROL</b>\n━━━━━━━━━━━━━━━━━━\n");
+    s.push_str("🖥 <b>VIGIL REMOTE CONTROL</b>\n━━━━━━━━━━━━━━━━━━\n");
     s.push_str(&format!("🟢 <b>Online</b> · <code>{}</code>\n", esc(&v.computer, MAX_SHORT)));
     s.push_str(&format!(
         "⏱ Uptime: {} · Service: {}\n",
@@ -591,7 +591,7 @@ pub fn features_keyboard(fs: &FeatureSet) -> InlineKeyboardMarkup {
 }
 
 pub fn features_screen(fs: &FeatureSet) -> Screen {
-    let mut s = String::from("⚙️ <b>PREDATOR FEATURES</b>\n");
+    let mut s = String::from("⚙️ <b>VIGIL FEATURES</b>\n");
     for (f, on) in fs.iter() {
         s.push_str(&format!("\n{} {}", dot(on), f.label()));
     }
@@ -808,7 +808,7 @@ fn chat_help(clean_after: Option<u64>) -> String {
 /// Help screen; `clean_after` describes the automatic chat cleaning (see [`chat_help`]).
 pub fn help_screen_with(confirm_secs: u64, stale_secs: u64, clean_after: Option<u64>) -> Screen {
     let s = format!(
-        "❓ <b>HELP — PREDATOR REMOTE CONTROL</b>\n\
+        "❓ <b>HELP — VIGIL REMOTE CONTROL</b>\n\
          \n<b>Information</b>\n\
          /menu — control panel with buttons\n\
          /status — system status\n\
@@ -840,7 +840,7 @@ pub fn help_screen_with(confirm_secs: u64, stale_secs: u64, clean_after: Option<
          🔐 Only paired Telegram accounts (checked by numeric user ID) can use this bot. Everyone else is \
          refused and reported to every paired user. Commands that change something are ignored when they are \
          older than {stale} (for example, sent while the PC was offline). Button presses that change something \
-         are ignored when Telegram delivers them late, after PREDATOR was offline — press them again.",
+         are ignored when Telegram delivers them late, after Vigil was offline — press them again.",
         power = Feature::PowerManagement.label(),
         scope = POWER_MANAGEMENT_SCOPE,
         tailscale = Feature::TailscaleManagement.label(),
@@ -1004,7 +1004,7 @@ pub fn nothing_to_cancel() -> Screen {
 /// be deleted).
 pub fn clear_disabled() -> Screen {
     (
-        "🧹 Automatic chat cleaning is switched off (<code>auto_clean_chat</code> in settings.json), so PREDATOR \
+        "🧹 Automatic chat cleaning is switched off (<code>auto_clean_chat</code> in settings.json), so Vigil \
          keeps no list of messages to delete."
             .into(),
         None,
@@ -1179,7 +1179,7 @@ mod tests {
         let (s, kb) = main_menu(&v);
         assert_eq!(
             s,
-            "🖥 <b>PREDATOR REMOTE CONTROL</b>\n━━━━━━━━━━━━━━━━━━\n🟢 <b>Online</b> · <code>MY-PC</code>\n\
+            "🖥 <b>VIGIL REMOTE CONTROL</b>\n━━━━━━━━━━━━━━━━━━\n🟢 <b>Online</b> · <code>MY-PC</code>\n\
              ⏱ Uptime: 3h 12m · Service: 2h 5m\n🔐 Login monitor: 🟢 Active · SSH: 🟢 Active\n📬 Queued alerts: 0"
         );
         let kb = kb.unwrap();
@@ -1296,7 +1296,7 @@ mod tests {
     fn features_layout() {
         let fs = FeatureSet::default();
         let (s, kb) = features_screen(&fs);
-        assert!(s.starts_with("⚙️ <b>PREDATOR FEATURES</b>\n"));
+        assert!(s.starts_with("⚙️ <b>VIGIL FEATURES</b>\n"));
         assert!(s.contains("\n🟢 Windows Login Monitoring"));
         assert!(s.contains("\n🔴 Failed Login Notifications"));
         let kb = kb.unwrap();
@@ -1535,7 +1535,7 @@ mod tests {
         );
         assert_eq!(
             BACKLOG_IGNORED,
-            "⌛ Ignored a button press that was queued while PREDATOR was offline. Press it again if you still \
+            "⌛ Ignored a button press that was queued while Vigil was offline. Press it again if you still \
              want this."
         );
     }

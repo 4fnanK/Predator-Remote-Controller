@@ -36,7 +36,7 @@ const SUSPEND_DELAY: Duration = Duration::from_secs(3);
 /// Delay before the single retry after ERROR_NOT_READY.
 const NOT_READY_RETRY_DELAY: Duration = Duration::from_secs(1);
 /// Message shown by Windows in the shutdown notification.
-const SHUTDOWN_NOTICE: &str = "Requested remotely via Predator Remote Controller.";
+const SHUTDOWN_NOTICE: &str = "Requested remotely via Vigil.";
 
 pub(crate) const SHUTDOWN_PRIVILEGE: &str = "SeShutdownPrivilege";
 

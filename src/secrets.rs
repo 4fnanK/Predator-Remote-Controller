@@ -179,9 +179,7 @@ fn encode_file(scope: Scope, blob: &[u8]) -> Vec<u8> {
 /// Split a token file into (scope, DPAPI blob).
 fn parse_file(data: &[u8]) -> Result<(Scope, &[u8]), String> {
     if data.len() < MAGIC.len() + 2 || &data[..MAGIC.len()] != MAGIC {
-        return Err(
-            "token.dat is not a Predator token file (bad header); store the token again with 'set-token'".into()
-        );
+        return Err("token.dat is not a Vigil token file (bad header); store the token again with 'set-token'".into());
     }
     let scope = Scope::from_byte(data[MAGIC.len()]).ok_or_else(|| {
         "token.dat has an unknown protection scope; store the token again with 'set-token'".to_string()
@@ -198,7 +196,7 @@ fn protect(plain: &[u8], scope: Scope) -> Result<Vec<u8>, String> {
     let entropy = blob_of(ENTROPY);
     let mut out = CRYPT_INTEGER_BLOB::default();
     let flags = CRYPTPROTECT_UI_FORBIDDEN | if scope == Scope::Machine { CRYPTPROTECT_LOCAL_MACHINE } else { 0 };
-    let description = wide("Predator bot token");
+    let description = wide("Vigil bot token");
     // SAFETY: all blobs point to live buffers for the duration of the call; `out` receives a
     // LocalAlloc'ed buffer which is copied and freed below.
     let ok = unsafe {

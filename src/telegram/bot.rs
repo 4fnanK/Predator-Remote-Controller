@@ -333,7 +333,7 @@ impl Bot {
     }
 
     /// Process one update. `from_backlog` marks an update that Telegram had queued while
-    /// PREDATOR was not polling (the first `getUpdates` batch after a start or an outage): its
+    /// Vigil was not polling (the first `getUpdates` batch after a start or an outage): its
     /// state-changing button presses (`act:*`, `ts:*`, `ft:*`, `pw:*`, `cf:*`) are then NOT
     /// executed — a callback has no press time, so it could otherwise run hours late — and the
     /// user is told to press again. Read-only buttons and `cx:*` work as usual; messages keep
@@ -746,7 +746,7 @@ impl Bot {
     /// that power action can never run from it.
     fn ignore_backlogged(&self, action: &CallbackAction, chat: i64, message_id: i64) -> Ack {
         crate::log_warn!(
-            "telegram: ignored button press {} — queued while PREDATOR was offline",
+            "telegram: ignored button press {} — queued while Vigil was offline",
             sanitize(&action.log_label(), LOG_TEXT_CHARS)
         );
         if let CallbackAction::Confirm(nonce) = action
@@ -2171,12 +2171,12 @@ mod tests {
     fn backlog_read_only_buttons_still_work() {
         let h = harness();
         let expected = [
-            (Nav::Main, "PREDATOR REMOTE CONTROL"),
+            (Nav::Main, "VIGIL REMOTE CONTROL"),
             (Nav::Status, "SYSTEM STATUS"),
             (Nav::Network, "NETWORK STATUS"),
             (Nav::Battery, "BATTERY STATUS"),
             (Nav::History, "LOGIN HISTORY"),
-            (Nav::Features, "PREDATOR FEATURES"),
+            (Nav::Features, "VIGIL FEATURES"),
             (Nav::Tailscale, "TAILSCALE"),
             (Nav::Help, "HELP"),
         ];
@@ -2292,15 +2292,15 @@ mod tests {
         assert!(t.contains("Connection: 🔴 Disconnected (Tailscale service stopped)"), "{t}");
         assert!(!t.contains('🟡'), "{t}");
         h.cmd("/features");
-        assert!(h.tg.last_text().contains("PREDATOR FEATURES"));
+        assert!(h.tg.last_text().contains("VIGIL FEATURES"));
         h.cmd("/history");
         assert!(h.tg.last_text().contains("LOGIN HISTORY"));
         h.cmd("/help");
         assert!(h.tg.last_text().contains("Confirmation policy"));
         h.cmd("/menu");
-        assert!(h.tg.last_text().contains("PREDATOR REMOTE CONTROL"));
+        assert!(h.tg.last_text().contains("VIGIL REMOTE CONTROL"));
         h.cmd("/start");
-        assert!(h.tg.last_text().contains("PREDATOR REMOTE CONTROL"));
+        assert!(h.tg.last_text().contains("VIGIL REMOTE CONTROL"));
         h.cmd("/tailscale reboot");
         assert!(h.tg.last_text().contains("Usage"));
         assert_no_confirmation(&h.tg);
@@ -2557,11 +2557,11 @@ mod tests {
             .unwrap();
         h.cmd("/features");
         let t = h.tg.last_text();
-        assert!(t.contains("PREDATOR FEATURES"));
+        assert!(t.contains("VIGIL FEATURES"));
         assert!(t.contains("🔴 Windows Login Monitoring"));
         assert!(!t.contains("🟢"));
         h.press("nav:feat");
-        assert!(h.tg.last_text().contains("PREDATOR FEATURES"));
+        assert!(h.tg.last_text().contains("VIGIL FEATURES"));
         h.press("ft:7");
         assert!(h.ctx.settings.feature(Feature::BatteryInfo));
         assert!(h.tg.last_text().contains("🟢 Battery Information"));
@@ -2571,7 +2571,7 @@ mod tests {
         h.cmd("/help");
         h.cmd("/history");
         h.cmd("/menu");
-        assert!(h.tg.last_text().contains("PREDATOR REMOTE CONTROL"));
+        assert!(h.tg.last_text().contains("VIGIL REMOTE CONTROL"));
     }
 
     // ───────────── navigation / misc ─────────────
@@ -2658,7 +2658,7 @@ mod tests {
         // message gone: the screen is sent as a new message instead
         h.tg.fail_edits.store(true, Ordering::SeqCst);
         h.press("nav:main");
-        assert!(h.tg.sends().last().unwrap().1.contains("PREDATOR REMOTE CONTROL"));
+        assert!(h.tg.sends().last().unwrap().1.contains("VIGIL REMOTE CONTROL"));
     }
 
     #[test]
@@ -3252,12 +3252,12 @@ mod tests {
         let h = harness();
         h.add_second();
         for (cmd, needle) in [
-            ("/menu", "PREDATOR REMOTE CONTROL"),
+            ("/menu", "VIGIL REMOTE CONTROL"),
             ("/status", "SYSTEM STATUS"),
             ("/network", "NETWORK STATUS"),
             ("/battery", "BATTERY STATUS"),
             ("/history", "LOGIN HISTORY"),
-            ("/features", "PREDATOR FEATURES"),
+            ("/features", "VIGIL FEATURES"),
             ("/tailscale", "TAILSCALE"),
             ("/help", "HELP"),
             ("/users", "TELEGRAM USERS"),
@@ -3389,7 +3389,7 @@ mod tests {
         h.press(&format!("um:rm:{OWNER}"));
         assert_eq!(h.tg.answers(), vec![(Some(ui::CANNOT_REMOVE_SELF.to_string()), true)]);
         assert!(h.ctx.settings.is_authorized(OWNER));
-        // a remove button pressed while PREDATOR was offline is not executed
+        // a remove button pressed while Vigil was offline is not executed
         h.tg.clear();
         h.press_backlog(&format!("um:rm:{SECOND}"));
         assert!(h.ctx.settings.is_authorized(SECOND));

@@ -70,11 +70,11 @@ const WM_TRAY: u32 = WM_APP + 1;
 /// `uID` of our (only) notification icon.
 const TRAY_UID: u32 = 1;
 const CLASS_NAME: &str = "PredatorRemoteControllerTray";
-const STATUS_CAPTION: &str = "Predator Remote Controller — Service Status";
-const PAIRING_CAPTION: &str = "Predator Remote Controller — Pair Telegram User";
-const USERS_CAPTION: &str = "Predator Remote Controller — Telegram Users";
+const STATUS_CAPTION: &str = "Vigil — Service Status";
+const PAIRING_CAPTION: &str = "Vigil — Pair Telegram User";
+const USERS_CAPTION: &str = "Vigil — Telegram Users";
 
-/// Periodic refresh (SCM queries of the Predator and Tailscale services + IPC Status only):
+/// Periodic refresh (SCM queries of the Vigil and Tailscale services + IPC Status only):
 /// [`RefreshPeriod::Safety`] while the service is watched, [`RefreshPeriod::Poll`] otherwise.
 const TIMER_REFRESH: usize = 1;
 /// One-shot refresh after "Restart Service" / "Start Service" and after the service (re)started.
@@ -857,7 +857,7 @@ fn guarded_status(pid: u32) -> Result<IpcResponse, String> {
 
 fn shielded(f: impl FnOnce() -> Result<IpcResponse, String>) -> Result<IpcResponse, String> {
     catch_unwind(AssertUnwindSafe(f))
-        .unwrap_or_else(|_| Err("Internal error while contacting the Predator service.".into()))
+        .unwrap_or_else(|_| Err("Internal error while contacting the Vigil service.".into()))
 }
 
 /// Open/arm/close the service watches for the current snapshot and (re-)set the refresh timer:
@@ -963,7 +963,7 @@ fn check_pending_start(hwnd: HWND) {
     if pending && matches!(state, ServiceState::Stopped | ServiceState::Paused | ServiceState::Unknown) {
         balloon(
             hwnd,
-            "Predator service is not running",
+            "Vigil service is not running",
             "The service did not start. Run \"predator-service.exe status\" in an elevated command prompt for details.",
             NIIF_WARNING,
         );

@@ -37,12 +37,12 @@ struct BinSpec {
 }
 
 const BINS: [BinSpec; 2] = [
-    BinSpec { name: "predator-service", description: "Predator Remote Controller Service", with_off_icon: false },
-    BinSpec { name: "predator-tray", description: "Predator Remote Controller Tray", with_off_icon: true },
+    BinSpec { name: "predator-service", description: "Vigil Service", with_off_icon: false },
+    BinSpec { name: "predator-tray", description: "Vigil Tray", with_off_icon: true },
 ];
 
-const PRODUCT_NAME: &str = "Predator Remote Controller";
-const COMPANY_NAME: &str = "Predator Remote Controller";
+const PRODUCT_NAME: &str = "Vigil";
+const COMPANY_NAME: &str = "Vigil";
 const LEGAL_COPYRIGHT: &str = "Copyright \u{a9} 2026 4fnanK. MIT License.";
 
 fn main() -> ExitCode {
@@ -730,13 +730,13 @@ pub mod res {
             VersionStrings {
                 version: [1, 2, 3, 0],
                 file_flags: VS_FF_PRERELEASE,
-                company_name: "Predator Remote Controller",
-                file_description: "Predator Remote Controller Tray",
+                company_name: "Vigil",
+                file_description: "Vigil Tray",
                 file_version: "1.2.3",
                 internal_name: "predator-tray",
                 legal_copyright: "Copyright \u{a9} test",
                 original_filename: "predator-tray.exe",
-                product_name: "Predator Remote Controller",
+                product_name: "Vigil",
                 product_version: "1.2.3",
             }
         }
@@ -866,7 +866,7 @@ pub mod res {
             }
             let get = |k: &str| found.iter().find(|(key, _)| key == k).map(|(_, v)| v.clone());
             assert_eq!(found.len(), 8);
-            assert_eq!(get("FileDescription").as_deref(), Some("Predator Remote Controller Tray"));
+            assert_eq!(get("FileDescription").as_deref(), Some("Vigil Tray"));
             assert_eq!(get("OriginalFilename").as_deref(), Some("predator-tray.exe"));
             assert_eq!(get("LegalCopyright").as_deref(), Some("Copyright \u{a9} test"));
             assert_eq!(get("ProductVersion").as_deref(), Some("1.2.3"));

@@ -169,7 +169,7 @@ pub(crate) fn prepare_install_dir(dir: &Path) -> Result<(), String> {
             let foreign = foreign_contents(&names);
             if !foreign.is_empty() {
                 return Err(format!(
-                    "{} already exists and contains files that are not part of Predator ({}). Move them \
+                    "{} already exists and contains files that are not part of Vigil ({}). Move them \
                      elsewhere (or delete the folder) and run setup again.",
                     dir.display(),
                     preview(&foreign)
@@ -232,7 +232,7 @@ impl Images {
                 if !sibling.is_file() {
                     return Err(format!(
                         "This build does not contain the tray program and {} was not found. Use the release file \
-                         PredatorRemoteController.exe (or build it with scripts\\build.ps1).",
+                         Vigil.exe (or build it with scripts\\build.ps1).",
                         sibling.display()
                     ));
                 }
@@ -291,13 +291,13 @@ fn preview(names: &[String]) -> String {
     s
 }
 
-/// A file that only Predator puts into its program folder.
+/// A file that only Vigil puts into its program folder.
 fn is_predator_marker(name: &str) -> bool {
     [SERVICE_EXE, TRAY_EXE, OLD_MANIFEST].iter().any(|m| m.eq_ignore_ascii_case(name)) || is_leftover(name)
 }
 
 /// The entries that keep an existing folder from being used as the program folder: none when it
-/// is empty or holds a Predator executable / leftover / old-installer manifest, otherwise all of
+/// is empty or holds a Vigil executable / leftover / old-installer manifest, otherwise all of
 /// them (the folder belongs to something else).
 pub(crate) fn foreign_contents(names: &[String]) -> Vec<String> {
     if names.iter().any(|n| is_predator_marker(n)) { Vec::new() } else { names.to_vec() }
@@ -305,7 +305,7 @@ pub(crate) fn foreign_contents(names: &[String]) -> Vec<String> {
 
 /// Whether uninstall deletes the file `name` (in the sub-folder `sub` of the program folder):
 /// the two executables and leftovers of interrupted updates always; in a `dedicated` folder
-/// (named `Predator`, or written by the old installer) also the old installer's README, scripts,
+/// (named `Vigil`, or written by the old installer) also the old installer's README, scripts,
 /// manifest, icons and docs. Everything else is left alone.
 pub(crate) fn is_removable(sub: Option<&str>, name: &str, dedicated: bool) -> bool {
     let n = name.to_ascii_lowercase();
@@ -501,7 +501,7 @@ pub(crate) fn clean_dir(dir: &Path) -> Vec<String> {
         }
         let removal = remove_or_schedule(&path);
         if planted {
-            notes.push(format!("WARNING: removed {} (Predator ships no such files).", path.display()));
+            notes.push(format!("WARNING: removed {} (Vigil ships no such files).", path.display()));
         }
         if let Removal::Failed(e) = removal {
             notes.push(format!("WARNING: {e}"));
@@ -548,11 +548,11 @@ struct Sweep {
     /// In use: deleted at the next restart.
     scheduled: Vec<PathBuf>,
     failed: Vec<String>,
-    /// Entries that are not Predator's (left alone), relative to the program folder.
+    /// Entries that are not Vigil's (left alone), relative to the program folder.
     kept: Vec<String>,
 }
 
-/// Delete Predator's files in `dir` (`sub` = its name below the program folder). Never follows
+/// Delete Vigil's files in `dir` (`sub` = its name below the program folder). Never follows
 /// or deletes junctions / symbolic links and never descends into folders it does not know.
 fn sweep(dir: &Path, sub: Option<&str>, dedicated: bool, s: &mut Sweep) {
     let Ok(entries) = std::fs::read_dir(dir) else {
@@ -597,7 +597,7 @@ fn sweep(dir: &Path, sub: Option<&str>, dedicated: bool, s: &mut Sweep) {
     }
 }
 
-/// Remove Predator's files from its program folder (see [`is_removable`]) and then the folder
+/// Remove Vigil's files from its program folder (see [`is_removable`]) and then the folder
 /// itself when nothing else is in it — files of other programs are never deleted. Files in use
 /// are deleted at the next restart. A junction or symbolic link is never followed. Returns notes.
 pub(crate) fn remove_install_dir(dir: &Path) -> Result<Vec<String>, String> {
@@ -616,7 +616,7 @@ pub(crate) fn remove_install_dir(dir: &Path) -> Result<Vec<String>, String> {
     let dedicated = dir.file_name().is_some_and(|n| n.to_string_lossy().eq_ignore_ascii_case("Predator"))
         || dir.join(OLD_MANIFEST).is_file();
     if !dedicated && !dir.join(SERVICE_EXE).exists() {
-        return Err(format!("Refusing to delete {}: it does not look like a Predator program folder.", dir.display()));
+        return Err(format!("Refusing to delete {}: it does not look like a Vigil program folder.", dir.display()));
     }
     let mut s = Sweep::default();
     sweep(dir, None, dedicated, &mut s);
@@ -624,7 +624,7 @@ pub(crate) fn remove_install_dir(dir: &Path) -> Result<Vec<String>, String> {
     if let Err(e) = std::fs::remove_dir(dir) {
         if !s.kept.is_empty() {
             notes.push(format!(
-                "{} was kept: it also contains {} (not part of Predator).",
+                "{} was kept: it also contains {} (not part of Vigil).",
                 dir.display(),
                 preview(&s.kept)
             ));
@@ -780,7 +780,7 @@ mod tests {
 
     #[test]
     fn uninstall_deletes_only_predator_files() {
-        // The service was registered from a shared folder (e.g. with 'install'): only Predator's
+        // The service was registered from a shared folder (e.g. with 'install'): only Vigil's
         // executables and leftovers go; everything else, and the folder, stays.
         let d = tmp("shared");
         for f in [SERVICE_EXE, TRAY_EXE, "predator-service.exe.old-0a0b", "README.md", "other.txt", "tool.dll"] {
@@ -794,7 +794,7 @@ mod tests {
         assert_eq!(names_in(&d.join("docs")), vec!["x.md"]);
         std::fs::remove_dir_all(&d).ok();
 
-        // A dedicated folder (named Predator): the old installer's files go too, other files stay.
+        // A dedicated folder (named Vigil): the old installer's files go too, other files stay.
         let root = tmp("dedicated");
         let p = root.join("Predator");
         std::fs::create_dir_all(p.join("assets")).unwrap();
@@ -854,7 +854,7 @@ mod tests {
         let d = tmp("foreign");
         std::fs::write(d.join("app.dll"), b"x").unwrap();
         let e = prepare_install_dir(&d).unwrap_err();
-        assert!(e.contains("not part of Predator") && e.contains("app.dll"), "{e}");
+        assert!(e.contains("not part of Vigil") && e.contains("app.dll"), "{e}");
         assert_eq!(names_in(&d), vec!["app.dll"]);
         std::fs::remove_dir_all(&d).ok();
     }

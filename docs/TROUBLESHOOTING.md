@@ -1,11 +1,11 @@
 # Troubleshooting
 
-Most problems are fixed from the **management menu**. Start `PredatorRemoteController.exe` again
+Most problems are fixed from the **management menu**. Start `Vigil.exe` again
 (or the installed copy, `C:\Program Files\Predator\predator-service.exe`, without arguments),
 confirm the Windows prompt (User Account Control), and the menu opens:
 
 ```
-Predator Remote Controller 1.0.0 - installed
+Vigil 1.0.0 - installed
   Service: Running | Bot: @YourPcBot | Telegram users: 2
   Installed in C:\Program Files\Predator (version 1.0.0)
 
@@ -101,22 +101,22 @@ than 200 lines a minute is cut off with
 
 ### "Windows protected your PC" (SmartScreen)
 
-`PredatorRemoteController.exe` is not code-signed, so Microsoft Defender SmartScreen may block the
+`Vigil.exe` is not code-signed, so Microsoft Defender SmartScreen may block the
 first start of a freshly downloaded copy with **Windows protected your PC**.
 
 1. Verify the download first. Download `SHA256SUMS.txt` from the same release and compare:
 
    ```powershell
    cd $env:USERPROFILE\Downloads
-   (Get-FileHash .\PredatorRemoteController.exe -Algorithm SHA256).Hash
-   Get-Content .\SHA256SUMS.txt          # lines look like "<sha-256> *PredatorRemoteController.exe"
+   (Get-FileHash .\Vigil.exe -Algorithm SHA256).Hash
+   Get-Content .\SHA256SUMS.txt          # lines look like "<sha-256> *Vigil.exe"
    ```
 
    Or as a single check (prints `True` when they match):
 
    ```powershell
    $expected = ((Select-String -Path .\SHA256SUMS.txt -Pattern 'PredatorRemoteController\.exe').Line -split '\s+')[0]
-   (Get-FileHash .\PredatorRemoteController.exe -Algorithm SHA256).Hash -eq $expected
+   (Get-FileHash .\Vigil.exe -Algorithm SHA256).Hash -eq $expected
    ```
 
    If the hashes differ, delete the file and download it again. Never run a copy that does not
@@ -137,7 +137,7 @@ screen says *the Wi-Fi helper could not be started*.
 1. Check the downloaded file against `SHA256SUMS.txt` (see above).
 2. Restore it from the antivirus quarantine, or download it again.
 3. Add an exclusion for `C:\Program Files\Predator` (and, for the setup, for the downloaded file).
-4. If an installed file was removed, repair the installation: run `PredatorRemoteController.exe`,
+4. If an installed file was removed, repair the installation: run `Vigil.exe`,
    choose **7 Uninstall** and answer **No** when asked whether to delete the data folder; then run
    it again. The wizard finds the stored token and the paired accounts and offers to keep them.
 
@@ -167,13 +167,13 @@ Nothing was installed or changed. Start the program again and choose **Yes**.
 | *Telegram rejected this token (401 Unauthorized).* | The token is wrong, was revoked with `/revoke`, or the bot was deleted | Paste the current token. See [TELEGRAM_SETUP.md](TELEGRAM_SETUP.md#rotating-the-token) |
 | *Could not reach Telegram to verify the token (…)* | No internet, or Telegram is blocked or needs a proxy | Fix the connection and try again; see [Behind a proxy](#proxy) |
 | *No working bot token after 5 attempts.* | Five tokens were refused | Run the program again |
-| *WARNING: C:\ProgramData\Predator cannot be trusted (…). It was moved to C:\ProgramData\Predator.untrusted-YYYYMMDD-HHMMSS and NOTHING from it is used …* | An existing data folder was not created by Predator: wrong owner, inherited or extra permissions, a junction, or files owned by another account | Nothing in it was used (token, users, settings, queue, audit-policy backup). Setup continues with a new protected folder. Delete the moved folder when you no longer need it |
+| *WARNING: C:\ProgramData\Predator cannot be trusted (…). It was moved to C:\ProgramData\Predator.untrusted-YYYYMMDD-HHMMSS and NOTHING from it is used …* | An existing data folder was not created by Vigil: wrong owner, inherited or extra permissions, a junction, or files owned by another account | Nothing in it was used (token, users, settings, queue, audit-policy backup). Setup continues with a new protected folder. Delete the moved folder when you no longer need it |
 | *Pairing did not complete: …* followed by *Try again?* | No valid code arrived before it expired, or the code was invalidated | Answer **Yes** and send the new code, or continue without a paired account and pair later from the menu (**2**). See [Pairing code does not work](#pairing-code-does-not-work) |
-| *C:\Program Files\Predator already exists and contains files that are not part of Predator (…)* | Setup never takes over a folder of another program | Move those files elsewhere, or delete the folder, and run setup again |
+| *C:\Program Files\Predator already exists and contains files that are not part of Vigil (…)* | Setup never takes over a folder of another program | Move those files elsewhere, or delete the folder, and run setup again |
 | *… is a junction or symbolic link. Delete it and run setup again.* | The program folder is a link | Delete the link and run setup again |
 | *the tray program embedded in this file is damaged (SHA-256 …)* | The download is damaged or was modified | Download the release again and check `SHA256SUMS.txt` |
-| *This build does not contain the tray program and … was not found.* | A development build (`predator-service.exe` from `target\release`) was started alone | Use the release file `PredatorRemoteController.exe`, or build it with `scripts\build.ps1` |
-| *WARNING: removed … (Predator ships no such files).* | A DLL, `.manifest` or `.local` file was found in the program folder and deleted | Check how it got there. Predator ships no DLLs |
+| *This build does not contain the tray program and … was not found.* | A development build (`predator-service.exe` from `target\release`) was started alone | Use the release file `Vigil.exe`, or build it with `scripts\build.ps1` |
+| *WARNING: removed … (Vigil ships no such files).* | A DLL, `.manifest` or `.local` file was found in the program folder and deleted | Check how it got there. Vigil ships no DLLs |
 | *The service is marked for deletion. Close services.msc / Event Viewer and try again.* | A previous uninstall is not finished | Close those windows (or reboot) and run setup again |
 | *The service did not start: …* and *installed, NOT running* in the summary | Installed, but the start failed | See [Service does not start](#service-does-not-start) |
 | *Tray icon: starts at the next sign-in (…)* | The tray could not be started in this session | It starts automatically at the next sign-in; see [Tray icon is hidden or missing](#tray-icon-is-hidden-or-missing) |
@@ -207,7 +207,7 @@ from a location other accounts can change.* Use setup, which copies and protects
    Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'PredatorRemoteController'; StartTime = (Get-Date).AddDays(-1) } |
        Format-List TimeCreated, Id, Message
    Get-WinEvent -FilterHashtable @{ LogName = 'System'; ProviderName = 'Service Control Manager'; StartTime = (Get-Date).AddDays(-1) } |
-       Where-Object Message -match 'Predator' | Format-List TimeCreated, Id, Message
+       Where-Object Message -match 'Vigil' | Format-List TimeCreated, Id, Message
    ```
 
 2. **Read the service log**, `%ProgramData%\Predator\logs\predator.log`. Startup errors are written
@@ -234,7 +234,7 @@ from a location other accounts can change.* Use setup, which copies and protects
    ```
 
 5. **Common causes:**
-   - A command reports that `C:\ProgramData\Predator` *was not created by the Predator installer
+   - A command reports that `C:\ProgramData\Predator` *was not created by the Vigil installer
      and cannot be trusted*. Stop the service and re-register it from the installed copy; that
      moves the untrusted folder aside and creates a new protected one:
 
@@ -264,7 +264,7 @@ Symptoms:
 Causes: the token was revoked with `/revoke` in @BotFather, mistyped, or the bot was deleted.
 
 The fix: get the current token from @BotFather (`/mybots` → your bot → *API Token*), then run
-`PredatorRemoteController.exe` and choose **4 Change bot token**. The token is typed into a hidden
+`Vigil.exe` and choose **4 Change bot token**. The token is typed into a hidden
 prompt and checked with Telegram before it is stored. Answer **Yes** to *Restart the service now so
 it uses the new token?*
 
@@ -359,15 +359,15 @@ account an Admin* in the menu).
 
 | Message | Why | What to do |
 |---|---|---|
-| *The Predator service is starting. Wait a few seconds until it runs, then try again.* | A starting service has already read its settings and polls the bot; neither the CLI nor the service could handle the pairing or removal safely | Wait until `status` shows `Running`, then try again |
-| *The Predator service is stopping. Wait until it has stopped (or start it again), then try again.* | The same while it stops | Wait, then try again |
-| *The state of the Predator service is unclear …* | The service is paused or the SCM could not be asked | `& $exe start` or `& $exe stop`, then try again |
+| *The Vigil service is starting. Wait a few seconds until it runs, then try again.* | A starting service has already read its settings and polls the bot; neither the CLI nor the service could handle the pairing or removal safely | Wait until `status` shows `Running`, then try again |
+| *The Vigil service is stopping. Wait until it has stopped (or start it again), then try again.* | The same while it stops | Wait, then try again |
+| *The state of the Vigil service is unclear …* | The service is paused or the SCM could not be asked | `& $exe start` or `& $exe stop`, then try again |
 | *Only an elevated administrator can create a pairing code for an Admin account.* | Admin codes need an elevated prompt while the service runs (an Admin can remove other accounts) | Use an elevated PowerShell, or the setup menu, or pair the account as a User |
 | *Removing a Telegram account needs an elevated (Administrator) prompt on this PC, or an Admin account in Telegram (/users).* | Removing accounts from the PC needs elevation | Use an elevated PowerShell or the setup menu (**3**), or remove it in Telegram with `/users` |
 | *The last admin cannot be removed (pair another admin first).* | Someone must be able to manage the list | Pair a second Admin first |
 | *Telegram user N is not authorized.* | No such id in the list | Check the id with `& $exe users list` |
 | *The running service did not answer …, so the account was NOT removed.* | The service runs but its local pipe did not respond; editing the settings behind its back would leave the account authorized | Restart the service (`& $exe stop`, then `& $exe start`) and try again |
-| *This Windows account is not allowed to control Predator …* | Neither the tray owner nor an elevated administrator | Use an elevated prompt |
+| *This Windows account is not allowed to control Vigil …* | Neither the tray owner nor an elevated administrator | Use an elevated prompt |
 | *No bot token stored yet. Run 'predator-service set-token' first.* | The service is stopped and no token is stored | Store the token (menu **4**) |
 
 While the service runs, `pair` (User role) works from the tray owner's normal prompt; the service
@@ -409,7 +409,7 @@ later also receive what is still queued.
 `409 Conflict: terminated by other getUpdates request` means another program is polling the same
 bot token. Common culprits:
 
-- a second Predator installation, on another PC or in a VM, using the same token (every PC needs
+- a second Vigil installation, on another PC or in a VM, using the same token (every PC needs
   its own bot);
 - `predator-service.exe console` with `--data-dir` and `--token-file` for the same bot while the
   service is running;
@@ -517,7 +517,7 @@ Good to know:
   network. `Test-NetConnection api.telegram.org -Port 443` tests the direct path from your account.
 - `server certificate rejected` means Windows did not trust the certificate it was shown, for
   example behind a TLS-inspecting proxy whose root certificate is not installed in the machine's
-  trust store. Predator never skips certificate validation; install the organisation's root
+  trust store. Vigil never skips certificate validation; install the organisation's root
   certificate in *Local Computer → Trusted Root Certification Authorities* or exempt
   `api.telegram.org` from inspection.
 
@@ -577,7 +577,7 @@ Select-String -Path "$data\logs\predator.log" -Pattern 'HTTP transport|HTTPS tra
    notifications instead (with less detail).
 
    ```powershell
-   & $exe audit status                         # Predator's view, with a sufficient / insufficient verdict
+   & $exe audit status                         # Vigil's view, with a sufficient / insufficient verdict
    auditpol /get /subcategory:"{0CCE9215-69AE-11D9-BED3-505054503030}"    # Logon: needs Success and Failure
    auditpol /get /subcategory:"{0CCE9216-69AE-11D9-BED3-505054503030}"    # Logoff: needs Success
    auditpol /get /subcategory:"{0CCE921C-69AE-11D9-BED3-505054503030}"    # Other Logon/Logoff: needs Success (unlock, RDP reconnect)
@@ -599,9 +599,9 @@ Select-String -Path "$data\logs\predator.log" -Pattern 'HTTP transport|HTTPS tra
 4. **Expected behaviour that is not a fault:**
    - Background logons (services, scheduled tasks, network share access, Window Manager and Font
      Driver accounts) are filtered out on purpose.
-   - An administrator's sign-in creates two linked logon events (UAC). Predator reports it once.
+   - An administrator's sign-in creates two linked logon events (UAC). Vigil reports it once.
    - An RDP reconnect creates a logon event and a reconnect event, and often a console disconnect.
-     Predator reports it as one alert.
+     Vigil reports it as one alert.
    - A burst of failed logins is limited to 10 alerts per 10 minutes; the rest are summarized (see
      [Queue and offline behaviour](#queue-and-offline-behaviour)).
 
@@ -670,14 +670,14 @@ query; the text names the reason.
     cause directly.
   - On some managed PCs, policy blocks the classic WLAN API. Turning on **Settings → Privacy &
     security → Location → Location services** for the device also unlocks that API. This is
-    optional, and Predator never changes the setting itself.
-- Predator never collects BSSIDs or scan results, so no location permission is required.
+    optional, and Vigil never changes the setting itself.
+- Vigil never collects BSSIDs or scan results, so no location permission is required.
 
 ## Remote Desktop and SSH over Tailscale
 
 Telegram cannot give you the PC's desktop or a shell. **Tailscale** gives the PC a private,
 encrypted address that you can reach from anywhere (a phone on mobile data, a laptop on another
-network) without port forwarding and without exposing RDP or SSH to the internet. Predator can
+network) without port forwarding and without exposing RDP or SSH to the internet. Vigil can
 switch Tailscale on and off from Telegram, so it only runs while you need it.
 
 **One-time preparation on the PC:**
@@ -694,7 +694,7 @@ switch Tailscale on and off from Telegram, so it only runs while you need it.
 
 **When you need the PC:**
 
-1. Send `/tailscale up`, or open **🛡 Tailscale** in `/menu` and press **▶️ Up**. Predator starts
+1. Send `/tailscale up`, or open **🛡 Tailscale** in `/menu` and press **▶️ Up**. Vigil starts
    the `Tailscale` service, starts the Tailscale app (`tailscale-ipn.exe`) in the signed-in user's
    session when it is not running, waits up to 30 seconds for the connection and runs a plain
    `tailscale up` only if it is still not connected. The result shows every step and the current
@@ -706,7 +706,7 @@ switch Tailscale on and off from Telegram, so it only runs while you need it.
    ssh alex@100.64.0.5          # SSH
    ```
 
-3. When you are done, send `/tailscale down` or press **⏹ Down**. Predator closes the Tailscale
+3. When you are done, send `/tailscale down` or press **⏹ Down**. Vigil closes the Tailscale
    app in every session and stops the `Tailscale` service, so nothing is listening on the tailnet
    and nothing uses resources.
 
@@ -725,7 +725,7 @@ was offline) are not executed.
 | `🟡 Needs login` | Tailscale itself is logged out: no Tailscale account is signed in for the profile in use. (A Windows user who is merely signed out shows `🟡 Connecting…` with `App: ⚪ Not running` instead, see the row above) | Sign in to Tailscale on the PC. To keep it connected without anyone signed in, enable **Run unattended** (Tailscale menu → Preferences), or run `tailscale set --unattended=true` **as the profile owner** |
 | `🟡 Needs admin approval` | The tailnet requires device approval | Approve the PC in the Tailscale admin console |
 | Login URL shown | Tailscale wants an interactive login | Open it only yourself: whoever completes it attaches the PC to *their* tailnet |
-| *... was refused for the service account ... retrying as &lt;user&gt;* | The profile belongs to a Windows user, and SYSTEM may not run the command | Predator ran the same plain command inside that user's session. If nobody is signed in, `/tailscale down` still stops the `Tailscale` service, which disconnects every user on this PC |
+| *... was refused for the service account ... retrying as &lt;user&gt;* | The profile belongs to a Windows user, and SYSTEM may not run the command | Vigil ran the same plain command inside that user's session. If nobody is signed in, `/tailscale down` still stops the `Tailscale` service, which disconnects every user on this PC |
 | `🟡 In use by another Windows user` | Another Windows user is currently using the Tailscale app | Use the account that owns the Tailscale profile, or switch the profile |
 | `🟡 Connecting…` / `🟡 Starting…` with `App: 🟢 Running` | tailscaled is still contacting the control server (often right after boot or while offline) | Wait and press 🔄 Refresh |
 | `⏳ A Tailscale operation is already running.` | Only one up/down runs at a time. Up or down can take up to 1–2 minutes when a step reaches its time limit | Wait for the first one to finish |
@@ -793,11 +793,11 @@ the next command, after `chat_clean_after_secs` without use (default 10 minutes)
 |---|---|---|
 | Login, logout, failed-login, SSH or security alerts stay | They are **always kept**; that is the point of the feature | Nothing. Delete single alerts by hand in Telegram if you want |
 | Messages from while auto-clean was switched off stay, and `/clear` does not remove them | Only messages sent while it is on are tracked | Use Telegram's **Clear history** once in the bot chat (chat menu → *Clear history*). Login alerts in that history are deleted too, so scroll through them first |
-| Messages older than **48 hours** stay | Telegram does not let bots delete them; Predator drops them from its list after 47 hours | Delete them by hand or with *Clear history* |
+| Messages older than **48 hours** stay | Telegram does not let bots delete them; Vigil drops them from its list after 47 hours | Delete them by hand or with *Clear history* |
 | A power confirmation (`⚠️ CONFIRM SHUTDOWN`) stays | It is kept while it can still be confirmed | Once it is confirmed, cancelled or expired it is cleaned like any other reply: with your next message, or after `chat_clean_after_secs` without use. `/clear` removes it at once and cancels it |
 | The first `/pair` message and its `✅ Paired with …` reply stay | During the first setup the setup window exchanges them itself (the service is not running yet), so they are not tracked. Later pairings go through the service and are cleaned like any other command | Delete them by hand |
 | Nothing is deleted at all; `/clear` says *Automatic chat cleaning is switched off* | `auto_clean_chat` is `false` in `settings.json` | Set it to `true` (elevated editor), then `& $exe stop; & $exe start` |
-| Replies stay much longer than 10 minutes | `chat_clean_after_secs` is larger, or Predator was offline (the time-based cleanup runs only while it reaches Telegram) | Check the value in `settings.json` (60 … 169200 seconds). Leftovers go with your next command |
+| Replies stay much longer than 10 minutes | `chat_clean_after_secs` is larger, or Vigil was offline (the time-based cleanup runs only while it reaches Telegram) | Check the value in `settings.json` (60 … 169200 seconds). Leftovers go with your next command |
 | Messages from before a **bot token change** stay | The list belongs to the previous bot; its entries are forgotten, never deleted (their ids could match the new bot's login alerts) | Delete them by hand in the old bot's chat |
 | Nothing is deleted and `predator.log` shows `chat cleanup: cannot delete …` | Telegram refused the deletion (for example, you blocked the bot) | Unblock the bot; new messages are cleaned again |
 
@@ -817,7 +817,7 @@ round.
 ## Tray icon is hidden or missing
 
 - **Hidden in the overflow area (^):** open *Settings → Personalization → Taskbar → Other system
-  tray icons* and turn on **Predator Remote Controller Tray** (the tray app's file description).
+  tray icons* and turn on **Vigil Tray** (the tray app's file description).
   You can also drag the icon from the overflow onto the taskbar.
 - **Not running:**
   - The tray starts at sign-in from `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` → value
@@ -862,11 +862,11 @@ round.
   `/sleep`, `/hibernate`, `/lock`, `/logout`, `/tailscale up` and `/tailscale down` older than 5
   minutes are **not executed**; you get
   `⌛ Ignored /lock sent at 14:02:11 — older than 5 minutes (sent while the PC was offline?)`.
-- Button presses carry no time stamp. Presses that Telegram had queued while Predator was not
+- Button presses carry no time stamp. Presses that Telegram had queued while Vigil was not
   polling (right after the service starts, or after more than 90 seconds without reaching Telegram)
   are treated as late: power, confirm, lock, logout, Tailscale up/down, feature toggles and
   removing a user are **not executed**, and the message changes to
-  `⌛ Ignored a button press that was queued while PREDATOR was offline. Press it again if you still want this.`
+  `⌛ Ignored a button press that was queued while Vigil was offline. Press it again if you still want this.`
   with the button offered again. A late **Confirm** also discards that confirmation, so send the
   power command again. Navigation buttons and **Cancel** work normally.
 - A burst of failed logins is rate-limited to 10 alerts per 10 minutes. The remainder is reported
@@ -895,14 +895,14 @@ for alerts delivered late.
 - *Confirmation expired.* Shutdown, restart, sleep and hibernate must be confirmed within 60
   seconds (`confirm_timeout_secs` in `settings.json`). Send the command again. Only the person who
   asked can confirm it, and each confirmation works once.
-- *Ignored a button press that was queued while PREDATOR was offline.* The press arrived late; see
+- *Ignored a button press that was queued while Vigil was offline.* The press arrived late; see
   [Queue and offline behaviour](#queue-and-offline-behaviour).
 - **Lock / logout** act immediately and need a signed-in user. With nobody signed in, the bot says
   so.
 
 ## Updating to a new version
 
-1. Download the new `PredatorRemoteController.exe` (and check it against `SHA256SUMS.txt`, see
+1. Download the new `Vigil.exe` (and check it against `SHA256SUMS.txt`, see
    [SmartScreen](#windows-protected-your-pc-smartscreen)).
 2. Start it and confirm the UAC prompt. Because the program is installed, the management menu
    opens with an extra option `5  Update installed program to this version (x.y.z)`. It is shown
@@ -914,7 +914,7 @@ for alerts delivered late.
 
 Token, paired accounts, settings, the queue and a forced HTTPS transport are kept.
 
-Unattended: `PredatorRemoteController.exe setup --yes` on an installed PC updates it when the file
+Unattended: `Vigil.exe setup --yes` on an installed PC updates it when the file
 differs, then prints the status.
 
 - *The installed program is already this version.* Nothing to do.
@@ -925,7 +925,7 @@ differs, then prints the status.
 
 ## Uninstall leftovers
 
-Run `PredatorRemoteController.exe` (or the installed copy without arguments), choose
+Run `Vigil.exe` (or the installed copy without arguments), choose
 **7 Uninstall** and confirm. It stops and removes the service, the tray icon and its autostart and
 the program files, and restores the original logon audit policy. It then asks whether to delete
 the data folder too (bot token, Telegram users, settings, logs); keep it to reinstall later with
@@ -960,7 +960,7 @@ Possible leftovers:
     Never use `auditpol /clear` or `/restore`. They reset **all** audit settings, not just these.
 - **Service "marked for deletion".** The service disappears once nothing holds a handle to it. Close
   *services.msc* and *Event Viewer*, or reboot.
-- **Program folder kept.** Uninstall deletes only Predator's own files (`predator-service.exe`,
+- **Program folder kept.** Uninstall deletes only Vigil's own files (`predator-service.exe`,
   `predator-tray.exe` and leftovers of interrupted updates). If you put other files in
   `C:\Program Files\Predator`, the folder and those files remain (*… was kept: it also contains …*).
   Files that are still in use, for example the installed copy when you started the uninstall from

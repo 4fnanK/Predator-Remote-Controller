@@ -1,13 +1,13 @@
 Monitor and control your Windows PC from a private Telegram bot: instant login alerts, status,
 lock, power actions with a confirmation, and Tailscale up and down for Remote Desktop and SSH from
 anywhere. What changed in this version is listed in
-[CHANGELOG.md](https://github.com/4fnanK/Predator-Remote-Controller/blob/main/CHANGELOG.md).
+[CHANGELOG.md](https://github.com/4fnanK/Vigil/blob/main/CHANGELOG.md).
 
 ## Download
 
 | File | What it is |
 |---|---|
-| `PredatorRemoteController.exe` | The whole program in one file: service, setup, management menu and tray icon. Windows 10/11 x64. |
+| `Vigil.exe` | The whole program in one file: service, setup, management menu and tray icon. Windows 10/11 x64. |
 | `SHA256SUMS.txt` | SHA-256 checksums for checking the download |
 
 ## Check the download
@@ -15,11 +15,11 @@ anywhere. What changed in this version is listed in
 In PowerShell, in the folder with both files:
 
 ```powershell
-Get-FileHash .\PredatorRemoteController.exe -Algorithm SHA256
+Get-FileHash .\Vigil.exe -Algorithm SHA256
 Get-Content .\SHA256SUMS.txt
 ```
 
-The hash must equal the one on the `PredatorRemoteController.exe` line of `SHA256SUMS.txt`
+The hash must equal the one on the `Vigil.exe` line of `SHA256SUMS.txt`
 (upper or lower case does not matter).
 
 > **Windows SmartScreen:** the program is not code-signed, so Windows may show *"Windows protected
@@ -29,7 +29,7 @@ The hash must equal the one on the `PredatorRemoteController.exe` line of `SHA25
 
 1. **Create a bot.** In Telegram, open [@BotFather](https://t.me/BotFather), send `/newbot` and
    copy the token it gives you.
-2. **Start the setup.** Double-click `PredatorRemoteController.exe` and confirm the UAC prompt.
+2. **Start the setup.** Double-click `Vigil.exe` and confirm the UAC prompt.
 3. **Paste the token** when the setup asks for it. It is hidden while you type and stored
    encrypted.
 4. **Pair your account.** On your phone, open the link the setup shows and tap **Start**, or send
@@ -40,14 +40,14 @@ The hash must equal the one on the `PredatorRemoteController.exe` line of `SHA25
 
 ## Upgrading
 
-Download the new `PredatorRemoteController.exe`, start it and confirm the UAC prompt. In the
+Download the new `Vigil.exe`, start it and confirm the UAC prompt. In the
 management menu, choose **5 Update installed program to this version**. Your bot token, Telegram
 users and settings are kept. If the service was running and the new version does not start, the
 previous version is restored automatically.
 
 ## Documentation
 
-- [README](https://github.com/4fnanK/Predator-Remote-Controller#readme): features, every bot
+- [README](https://github.com/4fnanK/Vigil#readme): features, every bot
   command and button, pairing, settings and the command-line reference
-- [Troubleshooting](https://github.com/4fnanK/Predator-Remote-Controller/blob/main/docs/TROUBLESHOOTING.md)
-- [Security policy](https://github.com/4fnanK/Predator-Remote-Controller/blob/main/SECURITY.md)
+- [Troubleshooting](https://github.com/4fnanK/Vigil/blob/main/docs/TROUBLESHOOTING.md)
+- [Security policy](https://github.com/4fnanK/Vigil/blob/main/SECURITY.md)

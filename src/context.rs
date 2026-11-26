@@ -591,13 +591,13 @@ mod tests {
     #[test]
     fn system_and_rendered_kinds() {
         let ctx = AppContext::for_tests();
-        assert!(ctx.emit_system("🟢", "PREDATOR ONLINE", &[], T0, None).unwrap());
+        assert!(ctx.emit_system("🟢", "VIGIL ONLINE", &[], T0, None).unwrap());
         assert!(ctx.emit_rendered(NotificationKind::Security, "🚨", "X", &[], T0, None).unwrap());
         let a = ctx.queue.front().unwrap();
         ctx.queue.ack(a.id).unwrap();
         let b = ctx.queue.front().unwrap();
         assert_eq!((a.kind, b.kind), (NotificationKind::System, NotificationKind::Security));
-        assert!(a.html.contains("PREDATOR ONLINE"));
+        assert!(a.html.contains("VIGIL ONLINE"));
     }
 
     #[test]

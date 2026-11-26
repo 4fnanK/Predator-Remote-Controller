@@ -145,7 +145,7 @@ pub(crate) fn authorize(sid: &str, elevated: bool, admin_member: bool, owner_sid
         return AuthDecision::Allowed("elevated administrator");
     }
     AuthDecision::Denied(
-        "This Windows account is not allowed to control Predator (only the configured owner and elevated \
+        "This Windows account is not allowed to control Vigil (only the configured owner and elevated \
          administrators are)."
             .into(),
     )
@@ -336,7 +336,7 @@ fn serve_with_sddl(
         if active.fetch_add(1, Ordering::SeqCst) >= MAX_WORKERS {
             active.fetch_sub(1, Ordering::SeqCst);
             log_debug!("IPC: too many slow requests at once; refusing one");
-            let busy = IpcResponse::Error { message: "The Predator service is busy; please try again.".into() };
+            let busy = IpcResponse::Error { message: "The Vigil service is busy; please try again.".into() };
             send_reply(conn.raw(), &io_ev, &busy, INLINE_CLOSE_WAIT);
             // SAFETY: valid pipe handle; closed when `conn` drops.
             unsafe { DisconnectNamedPipe(conn.raw()) };
@@ -395,7 +395,7 @@ fn serve_inline(pipe: HANDLE, ev: &OwnedEvent, handler: &dyn RequestHandler) -> 
 fn dispatch(handler: &dyn RequestHandler, client: &ClientIdentity, req: IpcRequest) -> IpcResponse {
     catch(|| handler.handle(client, req)).unwrap_or_else(|e| {
         log_error!("IPC handler crashed: {e}");
-        IpcResponse::Error { message: "Internal error in the Predator service".into() }
+        IpcResponse::Error { message: "Internal error in the Vigil service".into() }
     })
 }
 
@@ -865,9 +865,7 @@ fn set_feature(sh: &Shared, client: &ClientIdentity, key: &str, enabled: bool) -
 
 fn restart_service(sh: &Shared, client: &ClientIdentity) -> IpcResponse {
     if !sh.is_service {
-        return IpcResponse::Error {
-            message: "Restart is only available when Predator runs as a Windows service".into(),
-        };
+        return IpcResponse::Error { message: "Restart is only available when Vigil runs as a Windows service".into() };
     }
     match spawn_restart_helper(&sh.ctx.paths.root) {
         Ok(()) => {
@@ -877,7 +875,7 @@ fn restart_service(sh: &Shared, client: &ClientIdentity) -> IpcResponse {
                 client.display(),
                 client.sid
             ));
-            IpcResponse::Ok { message: "The Predator service is restarting".into() }
+            IpcResponse::Ok { message: "The Vigil service is restarting".into() }
         }
         Err(e) => IpcResponse::Error { message: e },
     }
@@ -1370,7 +1368,7 @@ mod tests {
         // wrong expected server pid → refused before sending anything
         let err =
             client_request(&name, &IpcRequest::Status, Duration::from_secs(3), ServerCheck::Pid(me + 1)).unwrap_err();
-        assert!(err.contains("not the Predator service"));
+        assert!(err.contains("not the Vigil service"));
 
         // a second server cannot take over the name
         let dup = serve(&name, Arc::new(StopFlag::new()), Arc::new(Echo));

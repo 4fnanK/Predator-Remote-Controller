@@ -64,7 +64,7 @@ impl TelegramApi {
         if !is_valid_token_format(token) {
             return Err(TgError::Unauthorized);
         }
-        let agent = format!("PredatorRemoteController/{}", crate::VERSION);
+        let agent = format!("Vigil/{}", crate::VERSION);
         let http = HttpClient::new(&agent).map_err(|e| network_error(&e))?;
         Ok(Self { http, token: token.to_owned(), legacy_delete: AtomicBool::new(false) })
     }

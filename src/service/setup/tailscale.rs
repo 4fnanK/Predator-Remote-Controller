@@ -5,7 +5,7 @@ use crate::sys::{ServiceState, TailscaleStatus};
 
 /// Why setup looks at Tailscale at all.
 pub(crate) const WHY: &str = "\
-Why Tailscale? Predator controls this PC through Telegram, but Telegram cannot give you its
+Why Tailscale? Vigil controls this PC through Telegram, but Telegram cannot give you its
 desktop or a shell. Tailscale puts the PC on your own private network (tailnet), so Remote
 Desktop (RDP) and SSH reach it from anywhere - no port forwarding on the router, nothing
 exposed to the internet. That is why /tailscale up is the first thing to send when you need

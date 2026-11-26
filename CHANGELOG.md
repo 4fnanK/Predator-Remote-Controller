@@ -5,13 +5,23 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-11-27
+
+### Changed
+
+- The project is now called **Vigil** (it was released as *Predator Remote Controller*). The
+  download is `Vigil.exe`, and the setup, tray icon, bot menus and alerts use the new name.
+- Existing installations update in place: run the new `Vigil.exe` and choose **Update** in the
+  management menu. The service, its folders, the bot token, paired accounts and settings are
+  unchanged.
+
 ## [1.0.0] - 2026-11-27
 
-First public release.
+First public release (as Predator Remote Controller).
 
 ### Added
 
-- **Single-file release.** `PredatorRemoteController.exe` contains the Windows service, the setup,
+- **Single-file release.** `Vigil.exe` contains the Windows service, the setup,
   the management menu, the command-line tool and the tray icon.
 - **Guided setup.** It runs after a double-click and a UAC prompt:
   - the bot token is entered hidden, checked with Telegram and stored encrypted with DPAPI;
@@ -50,4 +60,5 @@ First public release.
 - **Build and release tooling.** `scripts/build.ps1`, `scripts/test.ps1` and `scripts/measure.ps1`,
   CI on GitHub Actions, and tag-triggered releases with SHA-256 checksums.
 
-[1.0.0]: https://github.com/4fnanK/Predator-Remote-Controller/releases/tag/v1.0.0
+[1.0.1]: https://github.com/4fnanK/Vigil/releases/tag/v1.0.1
+[1.0.0]: https://github.com/4fnanK/Vigil/releases/tag/v1.0.0

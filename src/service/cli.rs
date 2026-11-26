@@ -327,7 +327,7 @@ pub(crate) fn usage() -> String {
         "{product} {version} — Windows service and management tool
 
 USAGE
-  PredatorRemoteController.exe                (no arguments: setup wizard / management menu)
+  Vigil.exe                (no arguments: setup wizard / management menu)
   predator-service.exe <command> [options]    (the installed copy of the same program)
 
 GETTING STARTED

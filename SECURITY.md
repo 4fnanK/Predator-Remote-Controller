@@ -1,6 +1,6 @@
 # Security policy
 
-Predator Remote Controller runs as **LocalSystem** and can shut down, lock or log off the PC it is
+Vigil runs as **LocalSystem** and can shut down, lock or log off the PC it is
 installed on. Security reports are taken seriously.
 
 ## Reporting a vulnerability
@@ -9,7 +9,7 @@ Please **do not open a public issue** for security problems. Use GitHub's privat
 **Security → Report a vulnerability** on this repository (GitHub Security Advisories).
 
 Include:
-- the version (`PredatorRemoteController.exe version`),
+- the version (`Vigil.exe version`),
 - what an attacker needs (local account? network access? a Telegram account?),
 - steps to reproduce and the impact you observed.
 

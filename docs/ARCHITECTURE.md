@@ -1,6 +1,6 @@
-# Predator Remote Controller — Architecture
+# Vigil — Architecture
 
-This document describes how Predator Remote Controller 1.0.0 is built: processes and threads,
+This document describes how Vigil 1.0.0 is built: processes and threads,
 data files, multi-user authorization and pairing, the Telegram protocol, the single-file setup,
 the event-log monitor, the HTTPS transport, the security model and the techniques that keep the
 idle footprint small. User-facing instructions are in the [README](../README.md),
@@ -54,7 +54,7 @@ signs in) that:
   the internet returns, to every user who does not have them yet;
 * has a separate per-user tray app (`predator-tray.exe`) that talks to the service over a secured
   named pipe and never duplicates monitoring or Telegram;
-* is released as one file, `PredatorRemoteController.exe` (the service executable with the tray
+* is released as one file, `Vigil.exe` (the service executable with the tray
   embedded), which installs, updates and uninstalls itself (§9).
 
 **Top priorities: extremely low RAM, ~zero idle CPU, reliability, security.**
@@ -165,7 +165,7 @@ re-reads the file before applying an update when another process changed it, so 
 copy never overwrites a change made by the command line or setup (for example a removed account).
 A corrupt `settings.json` or `queue.json` is renamed to `*.json.corrupt` and defaults are used.
 
-An untrusted existing data folder is renamed to `Predator.untrusted-YYYYMMDD-HHMMSS` by setup /
+An untrusted existing data folder is renamed to `Vigil.untrusted-YYYYMMDD-HHMMSS` by setup /
 `install` and never read.
 
 Program files: `<ProgramFilesDir>\Predator` (read from
@@ -367,7 +367,7 @@ Command-line pairing (`service/pairing.rs`):
   `/start pair-CODE` from private chats with `chat.id == from.id`. Failed attempts are never
   answered (they are only printed locally); an already authorized account gets "already paired"
   and the code stays valid. A 409 Conflict while the service is now running or starting ends the
-  pairing ("The Predator service was started meanwhile…"); other errors, including a 409 from
+  pairing ("The Vigil service was started meanwhile…"); other errors, including a 409 from
   another program, are retried every 3 s. After success the consumed updates are confirmed (not
   while the service polls), `telegram-state.json` is written with the bot id (the service resumes
   after them), `NEW TELEGRAM USER PAIRED` is queued in `queue.json` for the other accounts (only
@@ -437,7 +437,7 @@ backlog update, state-changing callbacks — `act:lock`, `act:logout`, `ts:up`, 
 `pw:*`, `cf:*` and `um:rm:*` (`CallbackAction::changes_state`) — are NOT executed: the callback is
 answered, a warning is logged (nonces redacted), and the pressed message is edited (send as
 fallback) to
-`⌛ Ignored a button press that was queued while PREDATOR was offline. Press it again if you still want this.`
+`⌛ Ignored a button press that was queued while Vigil was offline. Press it again if you still want this.`
 with a keyboard offering the same button again (feature toggles for `ft:*`, `[🛡 Tailscale]
 [⬅️ Back]` for `ts:*`, `[👥 Users] [⬅️ Back]` for `um:rm:*`, the main menu otherwise). A
 backlogged `cf:<nonce>` also takes and discards the matching pending confirmation. `nav:*`,
@@ -508,7 +508,7 @@ Sleep/hibernate: the result says `💤 DESKTOP-01 is going to sleep now.` /
 
 ### Main menu (`/start`, `/menu`, `nav:main`)
 ```
-🖥 <b>PREDATOR REMOTE CONTROL</b>
+🖥 <b>VIGIL REMOTE CONTROL</b>
 ━━━━━━━━━━━━━━━━━━
 🟢 <b>Online</b> · <code>DESKTOP-01</code>
 ⏱ Uptime: 3h 12m · Service: 2h 5m
@@ -563,7 +563,7 @@ stops (errors ignored). Disabled features: button presses and commands reply
 * **Login history**: last 10 `EventDetails` newest first, one compact line each:
   `🟢 25 Nov 14:30 · alex · Interactive` / `🔴 … · failed` / `🚪 … · logout` /
   `🔐 … · SSH 192.168.1.20`.
-* **Features**: title `⚙️ <b>PREDATOR FEATURES</b>` + one line per feature
+* **Features**: title `⚙️ <b>VIGIL FEATURES</b>` + one line per feature
   (`🟢 Windows Login Monitoring` / `🔴 Failed Login Notifications`), then two italic footnotes
   (toggles take effect immediately; `Power Management covers shutdown, restart, sleep, hibernate,
   lock and logout.`); keyboard: one toggle button per feature, 2 per row, text `🟢 Login Monitor`
@@ -596,7 +596,7 @@ stops (errors ignored). Disabled features: button presses and commands reply
   (`um:rm:234567890`) for every other account; everyone gets `[🔄 Refresh (um:ls)] [⬅️ Back]`.
   Results: toast `Removed Sam`; alerts `Only admins can remove users.`,
   `You cannot remove your own account here. Ask another admin, or remove it on the PC
-  (PredatorRemoteController.exe → Telegram users, or 'predator-service users remove ID').`, or the
+  (Vigil.exe → Telegram users, or 'predator-service users remove ID').`, or the
   last-admin error. The list is edited in place afterwards.
 * **Help**: grouped list of commands (Information, Power, Session, Tailscale, Users, Chat), the
   Power Management scope (all six actions), the Tailscale Management feature name, how a new
@@ -627,7 +627,7 @@ SshLogout → `🚪 SSH SESSION CLOSED`. Extra key/values appended before Time.
 
 `render_system(emoji, title, lines, time)` renders lifecycle, security and user notices as
 `<emoji> <b>TITLE</b>`, one `Key: value` line each (≤ 30 lines), then `🕒 Time: …`. Examples:
-`🟢 PREDATOR ONLINE`, `🔴 PREDATOR GOING OFFLINE`, `☀️ PREDATOR RESUMED`, `⚙️ FEATURE CHANGED`,
+`🟢 VIGIL ONLINE`, `🔴 VIGIL GOING OFFLINE`, `☀️ VIGIL RESUMED`, `⚙️ FEATURE CHANGED`,
 `⚠️ AUDIT POLICY INSUFFICIENT`, `⚠️ LOGIN MONITOR GAP` (kind System, auto-deleted, §12);
 `🚨 UNAUTHORIZED ACCESS ATTEMPT`, `🚨 SECURITY LOG CLEARED`, `👤 NEW TELEGRAM USER PAIRED`,
 `🗑 TELEGRAM USER REMOVED` (kind Security, kept).
@@ -680,7 +680,7 @@ HH:MM and HH:MM") when the window closes or with the next failure.
   kept. It does not delete the program files (the setup menu's Uninstall does, §9).
 * **Control handler** accepts STOP | PRESHUTDOWN | POWEREVENT | SESSIONCHANGE. POWEREVENT
   PBT_APMRESUMEAUTOMATIC → `Runtime::on_resume` (interrupt + kick poller and sender, queue
-  `☀️ PREDATOR RESUMED` at most once a minute); PBT_APMSUSPEND is only logged. SESSIONCHANGE →
+  `☀️ VIGIL RESUMED` at most once a minute); PBT_APMSUSPEND is only logged. SESSIONCHANGE →
   `monitor::on_session_change`.
 * **Fatal failures** (start failed, main thread panicked, `RegisterServiceCtrlHandlerExW` failed)
   are written to the Application event log (source `PredatorRemoteController`, event id 1000,
@@ -697,7 +697,7 @@ HH:MM and HH:MM") when the window closes or with the next failure.
   `PairingSlot`); `RealSystem::new(dry_run, start)` (dry_run = settings.dry_run || DRY_RUN marker
   || console); `TelegramSlot`, `Bot::new`; audit status; start monitors, connectivity watcher,
   poller, sender, IPC server. If the token is missing/invalid the monitors still run and queue
-  alerts; Telegram threads wait (re-check every 30 min, log once). Queue `🟢 PREDATOR ONLINE`
+  alerts; Telegram threads wait (re-check every 30 min, log once). Queue `🟢 VIGIL ONLINE`
   (computer, service started, version, boot time, dry-run mode) when
   `settings.lifecycle_notifications`.
 * **Connectivity hint**: `net::connectivity::current()` is advisory. While it says Disconnected or
@@ -827,7 +827,7 @@ HH:MM and HH:MM") when the window closes or with the next failure.
 ## 9. Single-file release and setup
 
 ### The release file
-`PredatorRemoteController.exe` is `predator-service.exe` built with the Cargo feature
+`Vigil.exe` is `predator-service.exe` built with the Cargo feature
 `embed-tray`: `scripts/build.ps1` builds `predator-tray.exe` first and then the service with
 `PREDATOR_EMBED_TRAY=<full path of that tray>`. `build.rs` checks the file (absolute path, at least
 1 KiB, `MZ` header) and passes its SHA-256 on as `PREDATOR_EMBED_TRAY_SHA256`;
@@ -880,7 +880,7 @@ already has a token and accounts).
 
 ### Management menu (`menu.rs`)
 ```
-Predator Remote Controller 1.0.0 - installed
+Vigil 1.0.0 - installed
   Service: Running | Bot: @YourPcBot | Telegram users: 2
   Installed in C:\Program Files\Predator (version 1.0.0)
 
@@ -911,14 +911,14 @@ restart a running service), authorize `--telegram-id` as Admin, then print the s
 ### Program files (`files.rs`)
 * `prepare_install_dir` refuses a folder that is not absolute, a drive root or top-level folder, a
   system folder (Windows, System32, Program Files itself, ProgramData, the user profile folders),
-  a junction or symbolic link, or an existing folder holding files that are not Predator's (no
-  Predator executable or leftover in it). A new folder is created atomically with
+  a junction or symbolic link, or an existing folder holding files that are not Vigil's (no
+  Vigil executable or leftover in it). A new folder is created atomically with
   `INSTALL_DIR_SDDL` =
   `O:BAD:PAI(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;BU)(A;OICI;RC;;;OW)`
   (SYSTEM + Administrators full, Users read/execute, OWNER RIGHTS only READ_CONTROL); an existing
   one gets the same owner and protected DACL. Afterwards nobody but SYSTEM and administrators may
   be able to write to it and the DACL must be protected, otherwise setup stops.
-* Before installing, loadable modules (`.dll/.ocx/.cpl/.local/.manifest` — Predator ships none) and
+* Before installing, loadable modules (`.dll/.ocx/.cpl/.local/.manifest` — Vigil ships none) and
   leftovers of interrupted runs are removed from the folder (`clean_dir`).
 * Images: the service image is this executable's own bytes; the tray is the embedded copy,
   verified against the SHA-256 recorded at build time before anything is written.
@@ -947,12 +947,12 @@ restart a running service), authorize `--telegram-id` as Admin, then print the s
 ### Uninstall (menu 7)
 `install::uninstall_steps` (stop and delete the service, remove the Run value, restore the audit
 policy, optionally delete the data folder). Only when the service registration is gone: stop the
-installed trays and `remove_install_dir`, which deletes only Predator's own files —
+installed trays and `remove_install_dir`, which deletes only Vigil's own files —
 `predator-service.exe`, `predator-tray.exe` and `.new-*` / `.old-*` leftovers, and in a dedicated
-folder named `Predator` also Predator's README, `assets\predator*.ico` and `docs\*.md`. It never
+folder named `Vigil` also Vigil's README, `assets\predator*.ico` and `docs\*.md`. It never
 follows junctions or symbolic links, never descends into folders it does not know, removes the
 folder only when it is empty and lists what it kept. Files in use are renamed to `.old-<hex>` and
-deleted at the next restart. A folder that does not look like Predator's is refused.
+deleted at the next restart. A folder that does not look like Vigil's is refused.
 
 ### Acting as the signed-in user (`desktop.rs`)
 The elevated setup never starts the tray or a browser elevated. It hands the target (installed
@@ -982,7 +982,7 @@ GUI-subsystem, single instance per session (named mutex `Local\PredatorRemoteCon
 hidden top-level tool window (not message-only, so the `TaskbarCreated` broadcast reaches it) +
 `Shell_NotifyIconW` (NOTIFYICON_VERSION_4, re-add on `TaskbarCreated`). Icons from resources:
 id 1 = normal, id 2 = service-stopped variant. Tooltip, e.g.
-`Predator Remote Controller\nService: Running\nTelegram: online\nTailscale: service running · Connected · 100.64.0.5`.
+`Vigil\nService: Running\nTelegram: online\nTailscale: service running · Connected · 100.64.0.5`.
 The Tailscale line is always present: `service running[ · <cached summary>]`, `service stopped`,
 `service starting`, `service stopping`, `service paused`, `not installed`, `management disabled`
 (when the service reports Tailscale Management off) or `unknown`; the SCM state of the `Tailscale`
@@ -991,7 +991,7 @@ The tray exits silently when the service answers `Denied` (its account is not th
 
 Event-driven refresh (`tray/watch.rs`, decisions in `tray/model.rs`):
 * The UI thread idles in an alertable `MsgWaitForMultipleObjectsEx(QS_ALLINPUT, MWMO_ALERTABLE |
-  MWMO_INPUTAVAILABLE)`. `NotifyServiceStatusChangeW` watches the Predator service (unless it is
+  MWMO_INPUTAVAILABLE)`. `NotifyServiceStatusChangeW` watches the Vigil service (unless it is
   not installed), and the `Tailscale` service unless Tailscale Management is reported off or that
   service is not installed or its state unknown (`should_watch`).
   Windows delivers each notification as an APC to that thread; the callback only copies the
@@ -1006,12 +1006,12 @@ Event-driven refresh (`tray/watch.rs`, decisions in `tray/model.rs`):
   inside modal loops) and reopened afterwards; a new watch reports the current state at once, so
   nothing is missed.
 * Periodic refresh (`TIMER_REFRESH`, `SetCoalescableTimer`): `SAFETY_REFRESH` = 5 min (30 s
-  tolerance) while the Predator service is watched and settled, for what the SCM does not report
+  tolerance) while the Vigil service is watched and settled, for what the SCM does not report
   (Telegram state, features, Tailscale summary); `POLL_REFRESH` = 60 s (5 s tolerance) while it is
   not watched, or while it runs without answering the status request or answers that Telegram is
   offline (`refresh_period`). Also: on menu open, after every action, and one follow-up refresh
   15 s after Start/Restart Service or after a notification showed the service (re)started.
-* A refresh = one SCM query of the Predator service (state + PID), IPC `Status` through
+* A refresh = one SCM query of the Vigil service (state + PID), IPC `Status` through
   `ipc::request_to_pid` with that PID (no second SCM round trip; user actions still use
   `ipc::request`, which asks the SCM itself), plus one SCM query of the `Tailscale` service unless
   the service reports Tailscale Management off (`tailscale_wanted`). It never spawns Tailscale.
@@ -1153,8 +1153,8 @@ chat with the bot, and what one user does never deletes anything in another user
   (menus, screens, results, confirmations, errors, hints, the pairing reply — an edit keeps the
   message id), every message a paired user sends in their private chat (commands, text, the
   `/pair` message), and delivered `System` notifications in each recipient's chat
-  (`is_ephemeral_kind` is true only for `NotificationKind::System`): `PREDATOR ONLINE`,
-  `PREDATOR GOING OFFLINE`, `PREDATOR RESUMED`, `FEATURE CHANGED`, `AUDIT POLICY INSUFFICIENT`,
+  (`is_ephemeral_kind` is true only for `NotificationKind::System`): `VIGIL ONLINE`,
+  `VIGIL GOING OFFLINE`, `VIGIL RESUMED`, `FEATURE CHANGED`, `AUDIT POLICY INSUFFICIENT`,
   `LOGIN MONITOR GAP`.
 * **Never tracked** (kept forever): `Login`, `Logout`, `FailedLogin` (including
   `FAILED LOGIN ALERTS SUPPRESSED`), `SshLogin`, `SshFailed`, `SshLogout`, `Security` (unauthorized
@@ -1460,7 +1460,7 @@ Measured on a Windows 11 x64 PC, both services idle, both monitors on:
 installed service and tray (read-only; it changes nothing).
 
 ### Where idle cost comes from
-Predator's own threads block in the kernel (§2). In a WinHTTP-based build the largest idle cost
+Vigil's own threads block in the kernel (§2). In a WinHTTP-based build the largest idle cost
 was WinHTTP's own worker thread pool — about 95 % of the process's idle wake-ups and about 1 MB of
 private memory (§15). The largest lever was therefore to take WinHTTP off the normal path; the
 remaining techniques remove smaller, steady costs.
@@ -1531,7 +1531,7 @@ remaining techniques remove smaller, steady costs.
 
 ## 18. Assets and build
 
-* **Icons**: `examples/icongen.rs` renders an original Predator logo (anti-aliased vector shapes,
+* **Icons**: `examples/icongen.rs` renders an original Vigil logo (anti-aliased vector shapes,
   no external art) to `assets/predator.ico` (16,20,24,32,40,48,64,128,256; PNG-compressed frames
   via `miniz_oxide`, a dev-dependency only) and `assets/predator-off.ico` (greyscale + red status
   dot; 16–48).
@@ -1558,7 +1558,7 @@ remaining techniques remove smaller, steady costs.
   `cargo build --release --target x86_64-pc-windows-msvc --bin predator-service --features
   embed-tray` with `PREDATOR_EMBED_TRAY` set to that tray. It writes `dist\` (default; a different
   `-OutDir` must be a plain, empty or previously generated folder):
-  `PredatorRemoteController.exe`, `README.md`, `LICENSE` and `SHA256SUMS.txt`, and verifies the
+  `Vigil.exe`, `README.md`, `LICENSE` and `SHA256SUMS.txt`, and verifies the
   result: `version` prints the Cargo version, `help` works, and the tray written by the hidden
   `extract-tray` diagnostic is byte-identical to the tray that was built. Nothing is installed.
 * **`scripts/test.ps1`** runs the tests (`-Ignored` adds the live `#[ignore]` tests);
@@ -1580,7 +1580,7 @@ of a paired user, and Telegram itself.
 
 ### Data-directory trust
 * `%ProgramData%` lets every standard user create sub-folders, and any account can create a
-  machine-scope DPAPI blob with the (public) entropy. A pre-created `Predator` folder could
+  machine-scope DPAPI blob with the (public) entropy. A pre-created `Vigil` folder could
   therefore carry a forged `token.dat`, an attacker's Telegram accounts in `settings.json` or a
   poisoned `audit-backup.json`.
 * Rule (`winsec::assess_data_dir`): the root is trusted only when SYSTEM or Administrators own it,
@@ -1588,7 +1588,7 @@ of a paired user, and Telegram itself.
   RIGHTS). Every file and folder inside must be owned by SYSTEM, Administrators, an
   `NT SERVICE\*` SID or the administrator running setup, grant nobody else access, and must not be
   a junction or symbolic link.
-* Setup and `install` move an untrusted folder to `Predator.untrusted-YYYYMMDD-HHMMSS` without
+* Setup and `install` move an untrusted folder to `Vigil.untrusted-YYYYMMDD-HHMMSS` without
   reading it, create a new one atomically with `DATA_DIR_SDDL` (`CreateDirectoryW` with a
   security descriptor), so there is never a moment with the inherited, user-writable ACL,
   re-secure it strictly (every child it cannot reset is fatal; junctions are removed, not
@@ -1606,7 +1606,7 @@ of a paired user, and Telegram itself.
 
 ### Program folder and binaries
 * A LocalSystem service binary must not be modifiable by non-admins. Setup creates
-  `<ProgramFilesDir>\Predator` atomically with `INSTALL_DIR_SDDL` or takes an existing Predator
+  `<ProgramFilesDir>\Predator` atomically with `INSTALL_DIR_SDDL` or takes an existing Vigil
   folder over (owner Administrators + protected DACL), refuses system folders, junctions and
   folders of other programs, and verifies the result (§9). The Program Files location comes from
   HKLM, which only administrators can change.

@@ -8,7 +8,7 @@
 //!   `deleteWebhook`, `setMyCommands`.
 //! * `getUpdates` long poll (50 s); every update is persisted to `telegram-state.json` *before*
 //!   it is dispatched, so a command is never executed twice after a crash or restart.
-//! * Updates that Telegram queued while PREDATOR was not polling (after a start, or after more
+//! * Updates that Telegram queued while Vigil was not polling (after a start, or after more
 //!   than [`OUTAGE`] without a successful poll) are fetched with short polls and dispatched as
 //!   *backlog*: their state-changing button presses are not executed.
 //! * Automatic chat cleanup: after the setup and after every successful getUpdates cycle, the
@@ -151,7 +151,7 @@ pub(crate) fn bind_to_bot(state: &mut PollState, stored: &mut Option<i64>, bot_i
     }
 }
 
-/// I2: decides which getUpdates batches are *backlog* — updates Telegram queued while PREDATOR
+/// I2: decides which getUpdates batches are *backlog* — updates Telegram queued while Vigil
 /// was not polling. That is everything pending at process start (or after the bot changed) and
 /// after an outage (no successful getUpdates for more than [`OUTAGE`]). Such batches are fetched
 /// with a zero-timeout poll so they contain only what was already queued (a button pressed
@@ -292,7 +292,7 @@ pub(crate) fn run(sh: &Arc<Shared>) {
                     backoff.reset();
                     // tracked message ids belong to one bot: forget those of a replaced bot
                     ctx.janitor.bind_bot(me_id);
-                    // start-up sweep: messages that expired while PREDATOR was stopped or offline
+                    // start-up sweep: messages that expired while Vigil was stopped or offline
                     sweep(sh);
                 }
                 Err(e) => {
@@ -321,7 +321,7 @@ pub(crate) fn run(sh: &Arc<Shared>) {
                 backlog.after_success(Instant::now(), now_unix(), updates.len(), catching_up);
                 if catching_up && !updates.is_empty() {
                     log_info!(
-                        "{} Telegram update(s) were queued while PREDATOR was not polling; buttons pressed in the \
+                        "{} Telegram update(s) were queued while Vigil was not polling; buttons pressed in the \
                          meantime are not executed",
                         updates.len()
                     );

@@ -1,4 +1,4 @@
-//! Interactive setup of the single-file release: what runs when `PredatorRemoteController.exe`
+//! Interactive setup of the single-file release: what runs when `Vigil.exe`
 //! is started without arguments outside the Service Control Manager (double-click), or with
 //! `setup`.
 //!

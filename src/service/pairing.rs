@@ -51,13 +51,13 @@ const TOKEN_FOR_SERVICE_ONLY: &str = "The stored bot token is protected for the 
                                       'predator-service set-token' (the token from @BotFather), then pair again — \
                                       or set the account directly with 'predator-service set-owner --telegram-id ID'.";
 
-const SERVICE_STARTING: &str = "The Predator service is starting. Wait a few seconds until it runs, then try again.";
+const SERVICE_STARTING: &str = "The Vigil service is starting. Wait a few seconds until it runs, then try again.";
 const SERVICE_STOPPING: &str =
-    "The Predator service is stopping. Wait until it has stopped (or start it again), then try again.";
-const SERVICE_STATE_UNCLEAR: &str = "The state of the Predator service is unclear (paused, or the Service Control \
+    "The Vigil service is stopping. Wait until it has stopped (or start it again), then try again.";
+const SERVICE_STATE_UNCLEAR: &str = "The state of the Vigil service is unclear (paused, or the Service Control \
                                      Manager could not be asked). Start it ('predator-service start') or stop it \
                                      ('predator-service stop'), then try again.";
-const SERVICE_STARTED_MEANWHILE: &str = "The Predator service was started meanwhile and now receives the bot's \
+const SERVICE_STARTED_MEANWHILE: &str = "The Vigil service was started meanwhile and now receives the bot's \
                                          messages. Start the pairing again: it then goes through the service.";
 
 /// How `pair` and `users remove` reach the list of Telegram accounts.

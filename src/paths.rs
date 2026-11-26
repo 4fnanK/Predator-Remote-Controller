@@ -27,7 +27,7 @@ pub const DATA_DIR_SDDL: &str = "O:BAD:PAI(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)";
 /// Windows service (SCM) name.
 pub const SERVICE_NAME: &str = "PredatorRemoteController";
 /// Service display name.
-pub const SERVICE_DISPLAY_NAME: &str = "Predator Remote Controller";
+pub const SERVICE_DISPLAY_NAME: &str = "Vigil";
 /// Service description shown in services.msc.
 pub const SERVICE_DESCRIPTION: &str =
     "Monitors Windows/SSH logins and provides secure remote control of this PC through a private Telegram bot.";

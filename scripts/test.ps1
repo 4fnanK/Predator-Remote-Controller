@@ -11,7 +11,7 @@
        and a few failed SSH logins for the fake user predator-spin-test against the local sshd,
        which an installed service reports as alerts. They never shut down, lock, change settings
        or use a real token.
-    2. predator-service.exe selftest       (only when the Predator service is installed; run this
+    2. predator-service.exe selftest       (only when the Vigil service is installed; run this
        script from an elevated PowerShell so the self-test can read the protected data folder)
 
 .PARAMETER Ignored

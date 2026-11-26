@@ -178,7 +178,7 @@ pub struct Settings {
     /// Send "service online"/"going offline" lifecycle messages.
     #[serde(default = "default_true")]
     pub lifecycle_notifications: bool,
-    /// Delete PREDATOR's short-lived chat messages automatically: menus, replies, the users'
+    /// Delete Vigil's short-lived chat messages automatically: menus, replies, the users'
     /// commands and system notices (online, offline, resumed ...). Login, logout, failed-login,
     /// SSH and security alerts are always kept. `false` = nothing is tracked or deleted.
     #[serde(default = "default_true")]

@@ -129,7 +129,7 @@ fn stdin_loop(sh: Arc<Shared>, inject: bool) {
 
 pub(crate) fn run(data: &DataCtx, opts: &ConsoleOptions, verbose: bool) -> Result<(), String> {
     if data.is_default && matches!(service_state().0, ServiceState::Running | ServiceState::StartPending) {
-        return Err("The Predator service is running and uses the default data directory. Stop it first, or run \
+        return Err("The Vigil service is running and uses the default data directory. Stop it first, or run \
                     the console with --data-dir DIR (a separate test directory)."
             .into());
     }

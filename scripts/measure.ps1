@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Measures the CPU and memory use of the installed Predator service and tray app.
+    Measures the CPU and memory use of the installed Vigil service and tray app.
 
 .DESCRIPTION
     Samples the running predator-service.exe (found through the SCM) and every running
@@ -183,7 +183,7 @@ catch {
     $svc = $null
 }
 if ($null -eq $svc) {
-    Write-Host "The service $ServiceName is not installed. Install it first: run PredatorRemoteController.exe (built by scripts\build.ps1 into dist\)." -ForegroundColor Red
+    Write-Host "The service $ServiceName is not installed. Install it first: run Vigil.exe (built by scripts\build.ps1 into dist\)." -ForegroundColor Red
     exit 1
 }
 if ($svc.State -ne 'Running' -or [int]$svc.ProcessId -le 0) {
@@ -219,7 +219,7 @@ try {
         if (@($targets | Where-Object { -not $_.Exited }).Count -eq 0) { break }
         if ($elapsed -ge $Seconds) { break }
         $pct = [int][Math]::Min(100, ($elapsed / $Seconds) * 100)
-        Write-Progress -Activity 'Measuring Predator' -Status "$([int]$elapsed) / $Seconds s" -PercentComplete $pct
+        Write-Progress -Activity 'Measuring Vigil' -Status "$([int]$elapsed) / $Seconds s" -PercentComplete $pct
         $next = [Math]::Min($next + $IntervalSeconds, [double]$Seconds)
         $wait = $next - $sw.Elapsed.TotalSeconds
         if ($wait -gt 0) { Start-Sleep -Milliseconds ([int]($wait * 1000)) }
@@ -227,7 +227,7 @@ try {
     $completed = $true
 }
 finally {
-    Write-Progress -Activity 'Measuring Predator' -Completed
+    Write-Progress -Activity 'Measuring Vigil' -Completed
     if (-not $completed) { Write-Host 'Measurement interrupted; partial results:' -ForegroundColor Yellow }
     $ok = Write-Report $targets $sw.Elapsed.TotalSeconds $logical $startedText
 }

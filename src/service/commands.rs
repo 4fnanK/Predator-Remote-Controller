@@ -65,7 +65,7 @@ impl DataCtx {
 /// Error text for a default data directory that cannot be trusted (see `winsec::assess_data_dir`).
 pub(crate) fn untrusted_data_dir_message(root: &Path, why: &str) -> String {
     format!(
-        "{} was not created by the Predator installer and cannot be trusted ({why}). Nothing in it is used. \
+        "{} was not created by the Vigil installer and cannot be trusted ({why}). Nothing in it is used. \
          Run 'predator-service install' from an elevated prompt (stop the service first): it moves the folder aside \
          and creates a new protected one.",
         root.display()

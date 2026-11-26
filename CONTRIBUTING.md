@@ -8,9 +8,9 @@ Requirements: Windows 10/11 x64, [Rust](https://rustup.rs) (stable, MSVC toolcha
 Visual Studio Build Tools with the "Desktop development with C++" workload (MSVC + Windows SDK).
 
 ```powershell
-git clone https://github.com/4fnanK/Predator-Remote-Controller.git
-cd Predator-Remote-Controller
-.\scripts\build.ps1          # fmt check, check, tests, clippy, release build → dist\PredatorRemoteController.exe
+git clone https://github.com/4fnanK/Vigil.git
+cd Vigil
+.\scripts\build.ps1          # fmt check, check, tests, clippy, release build → dist\Vigil.exe
 ```
 
 For quick iterations: `cargo check --all-targets`, `cargo test --lib`, and run the service in the

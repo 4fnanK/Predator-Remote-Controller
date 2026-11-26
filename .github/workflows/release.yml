@@ -35,16 +35,16 @@ jobs:
         shell: pwsh
         run: |
           $tag = '${{ github.event.inputs.tag || github.ref_name }}'
-          $exeVersion = (& ./dist/PredatorRemoteController.exe version) -replace '.*\s', ''
+          $exeVersion = (& ./dist/Vigil.exe version) -replace '.*\s', ''
           if ("v$exeVersion" -ne $tag) { throw "Tag $tag does not match the built version $exeVersion (Cargo.toml)." }
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          name: Predator Remote Controller ${{ github.event.inputs.tag || github.ref_name }}
+          name: Vigil ${{ github.event.inputs.tag || github.ref_name }}
           body_path: .github/RELEASE_NOTES.md
           files: |
-            dist/PredatorRemoteController.exe
+            dist/Vigil.exe
             dist/SHA256SUMS.txt
           fail_on_unmatched_files: true

@@ -1,12 +1,12 @@
 [package]
 name = "predator"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 rust-version = "1.88"
-description = "Predator Remote Controller - lightweight Windows remote control and login monitor via Telegram"
+description = "Vigil - lightweight Windows remote control and login monitor via Telegram"
 license = "MIT"
 authors = ["4fnanK"]
-repository = "https://github.com/4fnanK/Predator-Remote-Controller"
+repository = "https://github.com/4fnanK/Vigil"
 readme = "README.md"
 keywords = ["windows", "telegram", "remote-control", "tailscale", "service"]
 publish = false

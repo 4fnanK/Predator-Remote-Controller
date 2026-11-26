@@ -705,7 +705,7 @@ impl Runtime {
             ("Computer".to_string(), ctx.computer_name.clone()),
             ("Event".to_string(), "System resumed from sleep or hibernation".to_string()),
         ];
-        match catch(|| ctx.emit_system("☀️", "PREDATOR RESUMED", &lines, now, Some(format!("resume:{now}")))) {
+        match catch(|| ctx.emit_system("☀️", "VIGIL RESUMED", &lines, now, Some(format!("resume:{now}")))) {
             Ok(Ok(_)) => {}
             Ok(Err(e)) => log_warn!("cannot queue the resume notification: {e}"),
             Err(e) => log_error!("cannot render the resume notification: {e}"),
@@ -866,7 +866,7 @@ fn queue_online_message(sh: &Shared, dry_run: bool) {
         ));
     }
     let key = Some(format!("online:{}", ctx.started_unix));
-    match catch(|| ctx.emit_system("🟢", "PREDATOR ONLINE", &lines, ctx.started_unix, key)) {
+    match catch(|| ctx.emit_system("🟢", "VIGIL ONLINE", &lines, ctx.started_unix, key)) {
         Ok(Ok(_)) => {}
         Ok(Err(e)) => log_warn!("cannot queue the online notification: {e}"),
         Err(e) => log_error!("cannot render the online notification: {e}"),
@@ -925,7 +925,7 @@ fn start_offline_send(sh: &Shared, reason: StopReason) -> Option<mpsc::Receiver<
         ("Reason".to_string(), reason.label().to_string()),
         ("Uptime".to_string(), fmt_duration((now - ctx.started_unix).max(0) as u64)),
     ];
-    let html = match catch(|| crate::notify::format::render_system("🔴", "PREDATOR GOING OFFLINE", &lines, now)) {
+    let html = match catch(|| crate::notify::format::render_system("🔴", "VIGIL GOING OFFLINE", &lines, now)) {
         Ok(h) => h,
         Err(e) => {
             log_error!("cannot render the offline notification: {e}");

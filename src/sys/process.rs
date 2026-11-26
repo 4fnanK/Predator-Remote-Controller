@@ -485,7 +485,7 @@ fn current_pid() -> u32 {
 fn refuse_to_terminate(pid: u32, own_pid: u32) -> Option<String> {
     match pid {
         0 | 4 => Some(format!("Refusing to terminate system process {pid}.")),
-        p if p == own_pid => Some("Refusing to terminate the Predator service itself.".to_string()),
+        p if p == own_pid => Some("Refusing to terminate the Vigil service itself.".to_string()),
         _ => None,
     }
 }

@@ -1,4 +1,4 @@
-//! Predator Remote Controller — shared library used by both binaries.
+//! Vigil — shared library used by both binaries.
 //!
 //! * `predator-service.exe` — the LocalSystem Windows service (login monitor + Telegram bot)
 //!   and its command-line management interface (install / uninstall / set-token / pair / ...).
@@ -31,4 +31,4 @@ pub mod util;
 /// Product version (from Cargo.toml).
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Human readable product name.
-pub const PRODUCT_NAME: &str = "Predator Remote Controller";
+pub const PRODUCT_NAME: &str = "Vigil";

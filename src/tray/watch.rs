@@ -1,4 +1,4 @@
-//! Event-driven service state for the tray: `NotifyServiceStatusChangeW` watches on the Predator
+//! Event-driven service state for the tray: `NotifyServiceStatusChangeW` watches on the Vigil
 //! service (and on the `Tailscale` service while its line is shown) instead of polling the SCM.
 //!
 //! * Windows delivers a notification as an APC to the thread that armed the watch (the UI
@@ -87,7 +87,7 @@ fn with_set<R>(f: impl FnOnce(&mut WatchSet) -> R) -> Option<R> {
 
 fn service_name(target: WatchTarget) -> &'static str {
     match target {
-        WatchTarget::Predator => paths::SERVICE_NAME,
+        WatchTarget::Vigil => paths::SERVICE_NAME,
         WatchTarget::Tailscale => tailscale::SERVICE_NAME,
     }
 }
@@ -99,7 +99,7 @@ pub(super) fn init(hwnd: HWND) {
 
 /// Bring the watches in line with `wanted` (indexed by [`WatchTarget::index`]): close unwanted
 /// ones, open wanted ones the policy allows, and re-arm watches whose notification was handled.
-/// Returns whether the Predator service is watched, or None while paused / shut down.
+/// Returns whether the Vigil service is watched, or None while paused / shut down.
 pub(super) fn sync(wanted: [bool; TARGETS], now: Instant) -> Option<bool> {
     with_set(|set| {
         if set.paused > 0 || set.shut_down {
@@ -144,7 +144,7 @@ pub(super) fn sync(wanted: [bool; TARGETS], now: Instant) -> Option<bool> {
                 }
             }
         }
-        Some(set.watches[WatchTarget::Predator.index()].is_some())
+        Some(set.watches[WatchTarget::Vigil.index()].is_some())
     })
     .flatten()
 }
@@ -392,7 +392,7 @@ mod tests {
     fn callback_copies_the_result_and_ignores_garbage() {
         let mut n = SERVICE_NOTIFY_2W {
             dwVersion: SERVICE_NOTIFY_STATUS_CHANGE,
-            pContext: std::ptr::without_provenance_mut(WatchTarget::Predator.index()),
+            pContext: std::ptr::without_provenance_mut(WatchTarget::Vigil.index()),
             dwNotificationStatus: 0,
             dwNotificationTriggered: 8,
             ..Default::default()
@@ -401,10 +401,10 @@ mod tests {
         n.ServiceStatus.dwProcessId = 77;
         // SAFETY: valid SERVICE_NOTIFY_2W on the stack, alive for the call.
         unsafe { notify_callback((&raw const n).cast()) };
-        assert!(has_event(WatchTarget::Predator));
-        assert!(has_event(WatchTarget::Predator)); // peeking does not consume
+        assert!(has_event(WatchTarget::Vigil));
+        assert!(has_event(WatchTarget::Vigil)); // peeking does not consume
         assert_eq!(
-            take_event(WatchTarget::Predator),
+            take_event(WatchTarget::Vigil),
             Some(NotifyEvent { status: 0, triggered: 8, state: SERVICE_RUNNING, pid: 77 })
         );
         let mut msg = MSG::default();
@@ -418,9 +418,9 @@ mod tests {
             notify_callback((&raw const n).cast());
             notify_callback(std::ptr::null());
         }
-        assert_eq!(take_event(WatchTarget::Predator), None);
+        assert_eq!(take_event(WatchTarget::Vigil), None);
         assert_eq!(take_event(WatchTarget::Tailscale), None);
-        assert!(!has_event(WatchTarget::Predator));
+        assert!(!has_event(WatchTarget::Vigil));
     }
 
     /// pause/resume nest, an unbalanced resume does nothing, and a shut-down set never opens a
@@ -453,7 +453,7 @@ mod tests {
     #[test]
     fn storm_guard_closes_the_watch() {
         let now = Instant::now();
-        let target = WatchTarget::Predator;
+        let target = WatchTarget::Vigil;
         // Stand-in watch on a service every Windows has (read-only; never armed here).
         assert!(with_set(|set| set.watches[target.index()] = Some(open_named("EventLog"))).is_some());
         for i in 0..model::STORM_LIMIT {
@@ -504,13 +504,13 @@ mod tests {
         // A real notification (the current state, queued right after arming) arrives as an APC
         // while the thread sits in the idle wait (or already during the SCM call itself).
         let watch = open_named("EventLog");
-        arm(&watch, WatchTarget::Predator).expect("arm");
+        arm(&watch, WatchTarget::Vigil).expect("arm");
         let deadline = Instant::now() + Duration::from_secs(5);
-        let mut ev = take_event(WatchTarget::Predator);
+        let mut ev = take_event(WatchTarget::Vigil);
         while ev.is_none() && Instant::now() < deadline {
             let r = wait_for_input_or_apc(250);
             assert!(r == WAIT_IO_COMPLETION || r == WAIT_TIMEOUT, "unexpected wait result {r:#x}");
-            ev = take_event(WatchTarget::Predator);
+            ev = take_event(WatchTarget::Vigil);
         }
         assert_eq!(ev.map(|e| (e.status, e.state)), Some((ERROR_SUCCESS, SERVICE_RUNNING)));
     }
@@ -559,7 +559,7 @@ mod tests {
         assert!(last.1 <= settled.1 + 128 * 1024, "private memory keeps growing: {samples:?}");
     }
 
-    /// A full cycle with the real Predator service name: whatever its state on this machine
+    /// A full cycle with the real Vigil service name: whatever its state on this machine
     /// (running, stopped or not installed), sync either watches it or backs off, and pause /
     /// resume close and re-open the watch. Read-only (status queries only).
     #[test]
@@ -575,9 +575,9 @@ mod tests {
         }
         assert!(watched);
         // The first notification reports the current state.
-        let ev = wait_for_event(WatchTarget::Predator, 5_000).expect("current state");
+        let ev = wait_for_event(WatchTarget::Vigil, 5_000).expect("current state");
         assert_eq!(ev.status, ERROR_SUCCESS);
-        assert!(accept(WatchTarget::Predator, now));
+        assert!(accept(WatchTarget::Vigil, now));
         assert_eq!(sync([true, false], now), Some(true)); // re-armed
         assert!(with_set(|set| set.watches[0].as_ref().is_some_and(|w| w.armed)).unwrap_or(false));
 
@@ -585,9 +585,9 @@ mod tests {
         assert!(with_set(|set| set.watches[0].is_none()).unwrap_or(false));
         assert!(resume());
         assert_eq!(sync([true, false], now), Some(true));
-        assert!(wait_for_event(WatchTarget::Predator, 5_000).is_some());
+        assert!(wait_for_event(WatchTarget::Vigil, 5_000).is_some());
 
-        close(WatchTarget::Predator, Some(now));
+        close(WatchTarget::Vigil, Some(now));
         assert_eq!(sync([true, false], now), Some(false)); // retry delay
         shutdown();
     }

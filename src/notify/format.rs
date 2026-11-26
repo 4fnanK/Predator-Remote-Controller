@@ -359,12 +359,12 @@ mod tests {
     fn system_message() {
         let s = render_system(
             "🟢",
-            "PREDATOR ONLINE",
+            "VIGIL ONLINE",
             &[("Version".into(), "1.0.0".into()), ("".into(), "a <tag>".into())],
             T,
         );
         let l = lines(&s);
-        assert_eq!(l[0], "🟢 <b>PREDATOR ONLINE</b>");
+        assert_eq!(l[0], "🟢 <b>VIGIL ONLINE</b>");
         assert_eq!(l[1], "");
         assert_eq!(l[2], "Version: 1.0.0");
         assert_eq!(l[3], "a &lt;tag&gt;");

@@ -1,6 +1,6 @@
 # Telegram setup
 
-This guide creates a private bot for Predator Remote Controller, keeps its token safe and links
+This guide creates a private bot for Vigil, keeps its token safe and links
 your Telegram account (and, if you like, the accounts of other people) to the PC. Allow about 5
 minutes.
 
@@ -12,7 +12,7 @@ Every PC needs **its own bot**: two installations that share a token disturb eac
 1. In Telegram, open **[@BotFather](https://t.me/BotFather)**. It is the official bot for creating
    bots and has a blue verification check mark.
 2. Send `/newbot`.
-3. Enter a **display name**, for example `Predator PC`. You can change it later.
+3. Enter a **display name**, for example `Vigil PC`. You can change it later.
 4. Enter a **username**. It must end in `bot` (for example `YourPcBot`), and it must not be taken
    already.
 5. BotFather replies with the **bot token**, which looks like this:
@@ -31,7 +31,7 @@ Send these commands to @BotFather and pick your bot when asked:
 | Command | Choose | Why |
 |---|---|---|
 | `/setjoingroups` | **Disable** | Nobody can add the bot to a group. If it is added anyway, it leaves immediately. |
-| `/setprivacy` | **Enable** (the default) | In groups, the bot would see only commands addressed to it. Predator works only in private chats. |
+| `/setprivacy` | **Enable** (the default) | In groups, the bot would see only commands addressed to it. Vigil works only in private chats. |
 | `/setdescription` | optional | For example: *Private remote control for my PC.* |
 | `/setuserpic` | optional | You can use `assets/predator-256.png` from the repository. |
 
@@ -42,13 +42,13 @@ You do **not** need `/setcommands`. The service registers its command list (`/me
 
 Anyone who has the token can act as your bot. They could read the messages sent to it, or poll it
 in parallel with the service, which causes `409 Conflict` errors and lost commands. They still
-cannot control your PC, because Predator only obeys the numeric user ids of the accounts paired
+cannot control your PC, because Vigil only obeys the numeric user ids of the accounts paired
 on the PC. Even so, treat the token like a password:
 
 - Do not paste it into chats, screenshots, issue reports or scripts kept in Git.
 - If you use a token file for an [unattended setup](#unattended-setup), **delete the file**
   afterwards.
-- Predator never prints the token. Its logs automatically redact anything that looks like a token.
+- Vigil never prints the token. Its logs automatically redact anything that looks like a token.
 
 ### Rotating the token
 
@@ -56,7 +56,7 @@ Do this when the token may have leaked, or as routine hygiene:
 
 1. In @BotFather send `/revoke`, pick the bot, and copy the **new** token. The old token stops
    working at once.
-2. On the PC, run `PredatorRemoteController.exe` (or
+2. On the PC, run `Vigil.exe` (or
    `C:\Program Files\Predator\predator-service.exe` without arguments), confirm the UAC prompt and
    choose **4 Change bot token**. Paste the new token into the hidden prompt; it is checked with
    Telegram before it is stored. Answer **Yes** to *Restart the service now so it uses the new
@@ -91,7 +91,7 @@ menus in the old bot's chat stay until you delete them yourself.
 
 ## 4. How setup asks for the token
 
-Double-click `PredatorRemoteController.exe` and confirm the UAC prompt. The setup wizard explains
+Double-click `Vigil.exe` and confirm the UAC prompt. The setup wizard explains
 what it installs and asks *Install now?*. Its first step is the token:
 
 ```
@@ -106,7 +106,7 @@ Keep it secret: anyone who has it can read and send messages as your bot.
 
 Bot token (hidden; press Enter alone to cancel):
   Checking the token with Telegram...
-  OK - this is the token of @YourPcBot (Predator PC).
+  OK - this is the token of @YourPcBot (Vigil PC).
 ```
 
 - The input is **hidden**. Spaces and line breaks that come with a pasted token are removed.
@@ -129,7 +129,7 @@ How the token is stored:
 
 ## 5. Pair your Telegram account
 
-Predator obeys only Telegram accounts that were **paired on the PC**, identified by their numeric
+Vigil obeys only Telegram accounts that were **paired on the PC**, identified by their numeric
 user id. Usernames are never trusted. Up to 20 accounts can be paired.
 
 Pairing uses a **one-time 8-digit code** that is shown only on the PC. It is never sent to
@@ -167,7 +167,7 @@ Create a new code on the PC in one of three ways:
 | Where | How | Role |
 |---|---|---|
 | Tray icon | Right-click → **Pair Telegram User…**. A dialog shows the code and the link | User (Admin if nobody is paired yet) |
-| Setup menu | Run `PredatorRemoteController.exe` → **2 Pair a Telegram user**. It asks *Make this account an Admin (can also remove users)?* | User or Admin |
+| Setup menu | Run `Vigil.exe` → **2 Pair a Telegram user**. It asks *Make this account an Admin (can also remove users)?* | User or Admin |
 | Command line | `& "C:\Program Files\Predator\predator-service.exe" pair [--admin] [--ttl SECS]` | User, or Admin with `--admin` |
 
 The new person then opens the link or sends `/pair CODE` to the bot, exactly as above. Every other
@@ -217,13 +217,13 @@ on that PC shows it too.
 in an elevated PowerShell in the folder with the download:
 
 ```powershell
-.\PredatorRemoteController.exe setup --token-file .\token.txt --telegram-id 123456789 --yes
+.\Vigil.exe setup --token-file .\token.txt --telegram-id 123456789 --yes
 Remove-Item .\token.txt
 ```
 
 - `--yes` never asks anything. A new installation then needs both `--token-file` and
   `--telegram-id`; the account becomes an Admin.
-- On a PC where Predator is installed already, the same command updates the program when the file
+- On a PC where Vigil is installed already, the same command updates the program when the file
   is a different version, stores the given token, authorizes the given id as Admin, and prints the
   status.
 - Started from a normal prompt it asks for elevation (UAC) and continues in a new window that
@@ -247,15 +247,15 @@ Remove-Item .\token.txt
 
 ## 7. Keeping the chat clean
 
-Predator deletes its short-lived messages by itself, so the chat ends up holding only the alerts
+Vigil deletes its short-lived messages by itself, so the chat ends up holding only the alerts
 worth keeping.
 
 - **Kept:** Windows logins, logouts and failed logins (including the *failed login attempts
   suppressed* summary), SSH logins, failed SSH logins and closed SSH sessions, and security alerts
   such as *UNAUTHORIZED ACCESS ATTEMPT*, *NEW TELEGRAM USER PAIRED* and *TELEGRAM USER REMOVED*.
 - **Deleted automatically:** menus, status screens, command results, power confirmations once they
-  can no longer be confirmed, status notices (`PREDATOR ONLINE`, `PREDATOR GOING OFFLINE`,
-  `PREDATOR RESUMED`, `FEATURE CHANGED`, audit and monitor-gap notices) and the commands you type.
+  can no longer be confirmed, status notices (`VIGIL ONLINE`, `VIGIL GOING OFFLINE`,
+  `VIGIL RESUMED`, `FEATURE CHANGED`, audit and monitor-gap notices) and the commands you type.
   They go when you send your next message, or after 10 minutes without use. Pressing a button on
   a menu keeps that menu alive for another 10 minutes.
 - **`/clear`** deletes all of them at once, including the `/clear` message, and cancels a pending
@@ -266,7 +266,7 @@ Things to know:
 - The `/pair` message and the `✅ Paired with …` reply of the **first** pairing during setup are
   exchanged by the setup window, not by the service, so they are not deleted automatically. Delete
   them by hand. Later pairings are cleaned like any other command.
-- Messages sent while auto-clean was switched off are not known to Predator. Remove them once with
+- Messages sent while auto-clean was switched off are not known to Vigil. Remove them once with
   Telegram's **Clear history** in the bot chat. That also removes old login alerts, so read them
   first if you want to keep any.
 - The switch and the time are `auto_clean_chat` (default `true`) and `chat_clean_after_secs`
@@ -289,9 +289,9 @@ More detail: [TROUBLESHOOTING → Old bot messages are not deleted](TROUBLESHOOT
 - Every paired account receives every alert and can use every command, including power actions.
   Pair only people you would trust with the PC itself.
 - Bot chats are not end-to-end encrypted. Alerts and command replies pass through Telegram's
-  servers. Predator sends only what you see in the messages: computer name, user names, logon
+  servers. Vigil sends only what you see in the messages: computer name, user names, logon
   method, source IP, network and battery summaries, and Tailscale status (address, hostname,
   tailnet). It never collects passwords, Wi-Fi BSSIDs, browsing data or file contents.
 - On the PC, `settings.json` keeps the numeric id, display name (`@username` or first name), role
-  and date added of every paired account. For the chat auto-clean Predator stores only message ids
+  and date added of every paired account. For the chat auto-clean Vigil stores only message ids
   and times (`chat-cleanup.json`), never message text. Pairing codes exist only in memory.

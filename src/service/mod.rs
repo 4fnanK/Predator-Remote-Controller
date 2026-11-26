@@ -22,7 +22,7 @@ mod winsec;
 use cli::Command;
 use commands::DataCtx;
 
-/// Entry point of `predator-service.exe` (released as `PredatorRemoteController.exe`). With no
+/// Entry point of `predator-service.exe` (released as `Vigil.exe`). With no
 /// arguments it runs under the SCM, or — when started outside it (double-click) — the
 /// interactive setup; `service` runs under the SCM only; anything else is a CLI subcommand.
 /// Returns the process exit code.
@@ -116,7 +116,7 @@ pub fn main_entry() -> i32 {
 /// and whatever system DLLs load on demand) come from System32 only, never from the folder of
 /// the executable: the release file is typically started — and elevated — from the Downloads
 /// folder, where a planted `version.dll` would otherwise run as administrator. The static
-/// imports get the same rule from the image (`/DEPENDENTLOADFLAG:0x800`, see build.rs). Predator
+/// imports get the same rule from the image (`/DEPENDENTLOADFLAG:0x800`, see build.rs). Vigil
 /// ships no DLLs of its own.
 fn restrict_dll_search() {
     use windows_sys::Win32::System::LibraryLoader::{LOAD_LIBRARY_SEARCH_SYSTEM32, SetDefaultDllDirectories};

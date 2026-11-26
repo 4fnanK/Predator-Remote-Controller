@@ -165,7 +165,7 @@ pub(crate) fn wait_for_close(h: HANDLE, ev: &OwnedEvent, timeout: Duration) {
 /// How the client verifies the pipe server process.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum ServerCheck {
-    /// Must be the PID the SCM reports for the Predator service.
+    /// Must be the PID the SCM reports for the Vigil service.
     PredatorService,
     /// Must be exactly this PID (a caller that just queried the SCM itself; tests). 0 never matches.
     Pid(u32),
@@ -185,11 +185,10 @@ pub(crate) fn client_request(
     let ev = OwnedEvent::new_manual().map_err(String::from)?;
     let mut line = serde_json::to_vec(req).map_err(|e| format!("Cannot encode the request: {e}"))?;
     line.push(b'\n');
-    write_all(pipe.raw(), &ev, &line, deadline)
-        .map_err(|e| e.describe("sending the request to the Predator service"))?;
+    write_all(pipe.raw(), &ev, &line, deadline).map_err(|e| e.describe("sending the request to the Vigil service"))?;
     let reply = read_line(pipe.raw(), &ev, MAX_REPLY_BYTES, deadline)
-        .map_err(|e| e.describe("waiting for the Predator service to answer"))?;
-    serde_json::from_slice::<IpcResponse>(&reply).map_err(|e| format!("Invalid reply from the Predator service: {e}"))
+        .map_err(|e| e.describe("waiting for the Vigil service to answer"))?;
+    serde_json::from_slice::<IpcResponse>(&reply).map_err(|e| format!("Invalid reply from the Vigil service: {e}"))
 }
 
 fn connect(name: &[u16], deadline: Instant) -> Result<OwnedHandle, String> {
@@ -217,19 +216,19 @@ fn connect(name: &[u16], deadline: Instant) -> Result<OwnedHandle, String> {
             ERROR_PIPE_BUSY => {
                 let ms = remaining_ms(deadline).min(2000);
                 if ms == 0 {
-                    return Err("The Predator service is busy; please try again.".into());
+                    return Err("The Vigil service is busy; please try again.".into());
                 }
                 // SAFETY: NUL-terminated pipe name.
                 unsafe { WaitNamedPipeW(name.as_ptr(), ms) };
             }
             ERROR_FILE_NOT_FOUND => {
-                return Err("The Predator service is not running (its IPC pipe does not exist).".into());
+                return Err("The Vigil service is not running (its IPC pipe does not exist).".into());
             }
             ERROR_ACCESS_DENIED => {
-                return Err("Access to the Predator service pipe was denied for this account.".into());
+                return Err("Access to the Vigil service pipe was denied for this account.".into());
             }
             code => {
-                return Err(format!("Cannot connect to the Predator service: {}", WinError::new(code, "CreateFileW")));
+                return Err(format!("Cannot connect to the Vigil service: {}", WinError::new(code, "CreateFileW")));
             }
         }
     }
@@ -248,7 +247,7 @@ fn verify_server(pipe: &OwnedHandle, check: ServerCheck) -> Result<(), String> {
         }
     };
     if expected == 0 || expected != server_pid {
-        return Err("IPC server is not the Predator service".into());
+        return Err("IPC server is not the Vigil service".into());
     }
     Ok(())
 }

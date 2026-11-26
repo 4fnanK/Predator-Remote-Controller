@@ -3,7 +3,7 @@
 //! HKLM Run value and a hidden console prompt.
 //!
 //! Trust model of the data directory (`%ProgramData%\Predator`): every standard user may create
-//! folders in `%ProgramData%`, so a pre-existing `Predator` folder may have been planted with a
+//! folders in `%ProgramData%`, so a pre-existing `Vigil` folder may have been planted with a
 //! forged `token.dat` (any account can create a machine-scope DPAPI blob), an attacker's owner id
 //! or a poisoned `audit-backup.json`. A folder is trusted only when its owner is SYSTEM or
 //! Administrators and its DACL is protected and grants nobody else access ([`assess_data_dir`]).

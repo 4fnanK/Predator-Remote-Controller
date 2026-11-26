@@ -1,9 +1,9 @@
-# Building Predator Remote Controller
+# Building Vigil
 
 This guide covers building the program from source, running it safely while you develop, the test
 and measurement scripts, and how releases are published. To simply use the program, download the
 ready-made file from the
-[latest release](https://github.com/4fnanK/Predator-Remote-Controller/releases/latest) instead
+[latest release](https://github.com/4fnanK/Vigil/releases/latest) instead
 (see the [README](../README.md#quick-start)).
 
 ## Requirements
@@ -37,8 +37,8 @@ Visual C++ Redistributable.
 ## Get the source
 
 ```powershell
-git clone https://github.com/4fnanK/Predator-Remote-Controller.git
-cd Predator-Remote-Controller
+git clone https://github.com/4fnanK/Vigil.git
+cd Vigil
 ```
 
 ## Build the release with `scripts\build.ps1`
@@ -64,13 +64,13 @@ It then writes the release folder, `dist\` by default:
 
 | File | Content |
 |---|---|
-| `PredatorRemoteController.exe` | The whole program in one file: service, setup and management menu, command-line tool and the embedded tray |
+| `Vigil.exe` | The whole program in one file: service, setup and management menu, command-line tool and the embedded tray |
 | `SHA256SUMS.txt` | The SHA-256 of every file in the folder, one `<hash> *<file>` line each |
 | `README.md`, `LICENSE` | Copied from the repository |
 
 Finally it checks the result:
 
-- `PredatorRemoteController.exe version` must print the version from `Cargo.toml`;
+- `Vigil.exe version` must print the version from `Cargo.toml`;
 - `help` must work;
 - the tray extracted from the exe must be byte-for-byte the same as the tray built in step 5.
 
@@ -218,7 +218,7 @@ They do not change the PC's state, but two of them write test entries:
 .\scripts\test.ps1 -NoSelftest   # skip the selftest
 ```
 
-After the tests, when the Predator service is installed, the script runs its
+After the tests, when the Vigil service is installed, the script runs its
 `predator-service.exe selftest`, which changes nothing. Run the script from an elevated PowerShell
 so the selftest can read the protected data folder. It prints a summary table and exits with 0
 when everything passed and 1 otherwise.
@@ -253,7 +253,7 @@ footprint. The exit code is 1 if the service is not running.
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs `scripts\build.ps1` on `windows-latest` for every push to `main`,
-for every pull request and on manual start. It uploads `PredatorRemoteController.exe` and
+for every pull request and on manual start. It uploads `Vigil.exe` and
 `SHA256SUMS.txt` as a build artifact named `PredatorRemoteController-<commit>`.
 
 ## Making a release
@@ -271,10 +271,10 @@ Releases are built and published by `.github/workflows/release.yml`:
 
 3. The workflow then runs on `windows-latest`:
    - it runs `scripts\build.ps1` (all checks, tests and both builds);
-   - it checks that `PredatorRemoteController.exe version` matches the tag, and fails if, for
+   - it checks that `Vigil.exe version` matches the tag, and fails if, for
      example, the tag is `v1.2.0` but `Cargo.toml` says `1.1.0`;
-   - it publishes the GitHub Release `Predator Remote Controller vX.Y.Z` with the assets
-     `PredatorRemoteController.exe` and `SHA256SUMS.txt`. The release text comes from
+   - it publishes the GitHub Release `Vigil vX.Y.Z` with the assets
+     `Vigil.exe` and `SHA256SUMS.txt`. The release text comes from
      `.github/RELEASE_NOTES.md`.
 
 To rebuild and publish an existing tag again, start the **Release** workflow by hand and enter the

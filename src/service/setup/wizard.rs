@@ -159,7 +159,7 @@ pub(crate) fn run_wizard(io: &mut dyn Io, env: &mut dyn WizardEnv, opts: WizardO
 
     io.say(&format!("{} {} - Setup", crate::PRODUCT_NAME, crate::VERSION));
     io.say(&"=".repeat(crate::PRODUCT_NAME.len() + crate::VERSION.len() + 10));
-    io.say("This installs Predator Remote Controller on this PC:");
+    io.say("This installs Vigil on this PC:");
     io.say("  * a Windows service that starts with Windows (before anyone signs in), sends sign-in");
     io.say("    alerts to your private Telegram bot and lets you control the PC from Telegram;");
     io.say("  * a small tray icon for the signed-in user.");

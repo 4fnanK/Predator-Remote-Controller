@@ -40,7 +40,7 @@ pub const MENU_REOPEN_GUARD: Duration = Duration::from_millis(300);
 /// What the tray knows about the service after a refresh.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Snapshot {
-    /// SCM state of the Predator service.
+    /// SCM state of the Vigil service.
     pub service: ServiceState,
     /// PID reported by the SCM (0 when not running).
     pub pid: u32,
@@ -465,7 +465,7 @@ pub fn icon_kind(s: &Snapshot) -> IconKind {
     if s.running() { IconKind::Normal } else { IconKind::Stopped }
 }
 
-/// Tooltip, e.g. `Predator Remote Controller\nService: Running\nTelegram: online\nTailscale:
+/// Tooltip, e.g. `Vigil\nService: Running\nTelegram: online\nTailscale:
 /// service running · Connected · 100.64.0.5`, limited to [`TOOLTIP_MAX_UNITS`] UTF-16 units.
 /// The Tailscale line is always present (see [`Snapshot::tailscale_line`]).
 pub fn tooltip_text(s: &Snapshot) -> String {
@@ -806,7 +806,7 @@ pub fn status_report(s: &Snapshot, tailscale: Option<&TailscaleLive>, tray_versi
         }
         (ServiceState::NotInstalled, _) => {
             lines.push("Service: Not installed".into());
-            lines.push("Install it by starting PredatorRemoteController.exe (it runs the setup).".into());
+            lines.push("Install it by starting Vigil.exe (it runs the setup).".into());
         }
         (ServiceState::StartPending | ServiceState::StopPending, _) => {
             lines.push(format!("Service: {}", s.service.label()));
@@ -830,14 +830,14 @@ pub fn status_report(s: &Snapshot, tailscale: Option<&TailscaleLive>, tray_versi
 // Event-driven refresh: service status notifications + refresh timer
 // ---------------------------------------------------------------------------------------------
 
-/// Periodic refresh while the Predator service is watched (`NotifyServiceStatusChangeW`): only
+/// Periodic refresh while the Vigil service is watched (`NotifyServiceStatusChangeW`): only
 /// for the details the SCM does not report (Telegram connection, feature states, Tailscale
 /// summary). Service state changes arrive as notifications instead.
 pub const SAFETY_REFRESH: Duration = Duration::from_secs(5 * 60);
 /// Allowed drift of the safety refresh (`SetCoalescableTimer` tolerance), so Windows can batch the
 /// wake-up with other timers.
 pub const SAFETY_TOLERANCE: Duration = Duration::from_secs(30);
-/// Polling interval while the Predator service cannot be watched (not installed, being deleted,
+/// Polling interval while the Vigil service cannot be watched (not installed, being deleted,
 /// the watch failed or was backed off) or while it runs without answering the status request.
 pub const POLL_REFRESH: Duration = Duration::from_secs(60);
 /// Allowed drift of the polling refresh.
@@ -868,18 +868,18 @@ pub const WATCH_MASK: SERVICE_NOTIFY = SERVICE_NOTIFY_STOPPED
 /// A service whose SCM state the tray watches.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WatchTarget {
-    /// The Predator service (icon, tooltip, menu).
-    Predator,
+    /// The Vigil service (icon, tooltip, menu).
+    Vigil,
     /// The `Tailscale` service (tooltip line), only while the tray shows it.
     Tailscale,
 }
 
 impl WatchTarget {
-    pub const ALL: [WatchTarget; 2] = [WatchTarget::Predator, WatchTarget::Tailscale];
+    pub const ALL: [WatchTarget; 2] = [WatchTarget::Vigil, WatchTarget::Tailscale];
 
     pub fn index(self) -> usize {
         match self {
-            WatchTarget::Predator => 0,
+            WatchTarget::Vigil => 0,
             WatchTarget::Tailscale => 1,
         }
     }
@@ -894,7 +894,7 @@ impl WatchTarget {
 /// its line is shown and its state is known.
 pub fn should_watch(target: WatchTarget, s: &Snapshot) -> bool {
     match target {
-        WatchTarget::Predator => s.service != ServiceState::NotInstalled,
+        WatchTarget::Vigil => s.service != ServiceState::NotInstalled,
         WatchTarget::Tailscale => {
             s.tailscale_wanted() && !matches!(s.tailscale_service, ServiceState::NotInstalled | ServiceState::Unknown)
         }
@@ -904,7 +904,7 @@ pub fn should_watch(target: WatchTarget, s: &Snapshot) -> bool {
 /// The state (and PID, where the tray shows it) the snapshot holds for `target`.
 pub fn known_state(target: WatchTarget, s: &Snapshot) -> (ServiceState, Option<u32>) {
     match target {
-        WatchTarget::Predator => (s.service.clone(), Some(s.pid)),
+        WatchTarget::Vigil => (s.service.clone(), Some(s.pid)),
         WatchTarget::Tailscale => (s.tailscale_service.clone(), None),
     }
 }
@@ -1236,49 +1236,34 @@ mod tests {
     fn tooltip_matches_spec() {
         assert_eq!(
             tooltip_text(&running()),
-            "Predator Remote Controller\nService: Running\nTelegram: online\nTailscale: service running · Connected"
+            "Vigil\nService: Running\nTelegram: online\nTailscale: service running · Connected"
         );
         // No cached connection summary (nobody asked for a while): the SCM state alone, never dropped.
         let mut s = running();
         if let Some(i) = s.status.as_mut() {
             i.tailscale = None;
         }
-        assert_eq!(
-            tooltip_text(&s),
-            "Predator Remote Controller\nService: Running\nTelegram: online\nTailscale: service running"
-        );
+        assert_eq!(tooltip_text(&s), "Vigil\nService: Running\nTelegram: online\nTailscale: service running");
         let s = running().with_tailscale_service(ServiceState::Stopped);
-        assert_eq!(
-            tooltip_text(&s),
-            "Predator Remote Controller\nService: Running\nTelegram: online\nTailscale: service stopped"
-        );
-        // Predator stopped: the Tailscale line comes from the SCM only.
+        assert_eq!(tooltip_text(&s), "Vigil\nService: Running\nTelegram: online\nTailscale: service stopped");
+        // Vigil stopped: the Tailscale line comes from the SCM only.
         assert_eq!(
             tooltip_text(&state(ServiceState::Stopped).with_tailscale_service(ServiceState::Running)),
-            "Predator Remote Controller\nService: Stopped\nTailscale: service running"
+            "Vigil\nService: Stopped\nTailscale: service running"
         );
         assert_eq!(
             tooltip_text(&state(ServiceState::NotInstalled).with_tailscale_service(ServiceState::NotInstalled)),
-            "Predator Remote Controller\nService: Not installed\nTailscale: not installed"
+            "Vigil\nService: Not installed\nTailscale: not installed"
         );
-        assert_eq!(
-            tooltip_text(&state(ServiceState::Stopped)),
-            "Predator Remote Controller\nService: Stopped\nTailscale: unknown"
-        );
+        assert_eq!(tooltip_text(&state(ServiceState::Stopped)), "Vigil\nService: Stopped\nTailscale: unknown");
         let s = Snapshot::from_parts(ServiceState::Running, 1, Some(StatusFetch::Unavailable("x".into())))
             .unwrap()
             .with_tailscale_service(ServiceState::StartPending);
-        assert_eq!(
-            tooltip_text(&s),
-            "Predator Remote Controller\nService: Running (not responding)\nTailscale: service starting"
-        );
+        assert_eq!(tooltip_text(&s), "Vigil\nService: Running (not responding)\nTailscale: service starting");
         // Tailscale Management disabled: mirrors the service, which refuses Tailscale requests.
         let mut s = running();
         set_feature(&mut s, Feature::TailscaleManagement, false);
-        assert_eq!(
-            tooltip_text(&s),
-            "Predator Remote Controller\nService: Running\nTelegram: online\nTailscale: management disabled"
-        );
+        assert_eq!(tooltip_text(&s), "Vigil\nService: Running\nTelegram: online\nTailscale: management disabled");
     }
 
     #[test]
@@ -1719,7 +1704,7 @@ mod tests {
         let text = status_report(&s, None, "1.0.0");
         assert!(text.contains("\nTailscale: management disabled\n"), "{text}");
 
-        // Predator not running: the Tailscale state still comes from the SCM.
+        // Vigil not running: the Tailscale state still comes from the SCM.
         let s = state(ServiceState::Stopped).with_tailscale_service(ServiceState::Running);
         let text = status_report(&s, None, "1.0.0");
         assert!(text.contains("\nTailscale: service running\n"), "{text}");
@@ -1764,10 +1749,10 @@ mod tests {
     #[test]
     fn which_services_are_watched() {
         use WatchTarget::*;
-        assert!(should_watch(Predator, &running()));
-        assert!(should_watch(Predator, &state(ServiceState::Stopped)));
-        assert!(should_watch(Predator, &state(ServiceState::Unknown))); // query failed: try anyway
-        assert!(!should_watch(Predator, &state(ServiceState::NotInstalled)));
+        assert!(should_watch(Vigil, &running()));
+        assert!(should_watch(Vigil, &state(ServiceState::Stopped)));
+        assert!(should_watch(Vigil, &state(ServiceState::Unknown))); // query failed: try anyway
+        assert!(!should_watch(Vigil, &state(ServiceState::NotInstalled)));
 
         assert!(should_watch(Tailscale, &running()));
         assert!(should_watch(Tailscale, &running().with_tailscale_service(ServiceState::Stopped)));
@@ -1777,13 +1762,13 @@ mod tests {
         let mut s = running();
         set_feature(&mut s, Feature::TailscaleManagement, false);
         assert!(!should_watch(Tailscale, &s));
-        // Predator stopped (feature state unknown): the SCM line is still shown → watched.
+        // Vigil stopped (feature state unknown): the SCM line is still shown → watched.
         assert!(should_watch(Tailscale, &state(ServiceState::Stopped).with_tailscale_service(ServiceState::Running)));
     }
 
     #[test]
     fn known_states() {
-        assert_eq!(known_state(WatchTarget::Predator, &running()), (ServiceState::Running, Some(4242)));
+        assert_eq!(known_state(WatchTarget::Vigil, &running()), (ServiceState::Running, Some(4242)));
         let s = state(ServiceState::Stopped).with_tailscale_service(ServiceState::StopPending);
         assert_eq!(known_state(WatchTarget::Tailscale, &s), (ServiceState::StopPending, None));
     }
@@ -1982,7 +1967,7 @@ mod tests {
         assert!(text.contains("Start Service (admin)…"));
         assert!(text.contains("Tailscale: unknown"));
         let text = status_report(&state(ServiceState::NotInstalled), None, "1.0.0");
-        assert!(text.contains("PredatorRemoteController.exe"));
+        assert!(text.contains("Vigil.exe"));
         let text = status_report(&state(ServiceState::StopPending), None, "1.0.0");
         assert!(text.contains("Service: Stopping"));
         let s = Snapshot::from_parts(ServiceState::Running, 77, Some(StatusFetch::Unavailable("pipe timeout".into())))

@@ -4,7 +4,7 @@
 //! * `predator-tray.exe --lock` → `LockWorkStation()`; exit code 0 or the Win32 error. No window,
 //!   no mutex, nothing else (launched by the service inside the user's session).
 //! * `predator-tray.exe` → one tray icon per session (named mutex), hidden window, context menu,
-//!   status refresh on menu open / after actions / when the Predator or `Tailscale` service
+//!   status refresh on menu open / after actions / when the Vigil or `Tailscale` service
 //!   changes state (`NotifyServiceStatusChangeW`, no polling) / every 5 minutes for the details
 //!   the SCM does not report (every 60 s while the service cannot be watched, does not answer or
 //!   reports Telegram as offline, e.g. right after a start or while the network is down).
