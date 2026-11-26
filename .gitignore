@@ -1,0 +1,31 @@
+# Build output
+/target/
+/target-*/
+/dist/
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Editors / OS
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+desktop.ini
+
+# Local test data and secrets — never commit a bot token
+*.token
+token.txt
+token.dat
+settings.json
+/data/
+/console-data*/
+
+# Local archives
+*.rar
+*.zip
+*.7z
+*.stackdump

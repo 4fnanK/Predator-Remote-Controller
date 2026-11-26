@@ -1,0 +1,118 @@
+[package]
+name = "predator"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Predator Remote Controller - lightweight Windows remote control and login monitor via Telegram"
+license = "MIT"
+authors = ["4fnanK"]
+repository = "https://github.com/4fnanK/Predator-Remote-Controller"
+readme = "README.md"
+keywords = ["windows", "telegram", "remote-control", "tailscale", "service"]
+publish = false
+build = "build.rs"
+
+[lib]
+name = "predator"
+path = "src/lib.rs"
+
+[[bin]]
+name = "predator-service"
+path = "src/bin/predator-service.rs"
+
+[[bin]]
+name = "predator-tray"
+path = "src/bin/predator-tray.rs"
+
+[features]
+default = []
+# Single-file release: embeds predator-tray.exe (path in the PREDATOR_EMBED_TRAY environment
+# variable, set by scripts/build.ps1) into predator-service.exe, which then installs both itself.
+# Only for `--bin predator-service`; build the tray first without it.
+embed-tray = []
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# SChannel (OS TLS) bindings for the direct HTTPS transport (src/net/direct.rs): TLS 1.2/1.3 via
+# SCH_CREDENTIALS, certificate chain + host name validation against the Windows trust store.
+# Uses windows-sys 0.61 like this crate, so nothing else is pulled in.
+schannel = "0.1.30"
+
+# Raw Win32 bindings (zero-cost, no runtime).
+[dependencies.windows-sys]
+version = "0.61"
+features = [
+    "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_Graphics_Gdi",
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_NetworkManagement_Ndis",
+    "Win32_NetworkManagement_WiFi",
+    "Win32_Networking_WinHttp",
+    "Win32_Networking_WinSock",
+    "Win32_Security",
+    "Win32_Security_Authentication_Identity",
+    "Win32_Security_Authorization",
+    "Win32_Security_Cryptography",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Com",
+    "Win32_System_Console",
+    "Win32_System_Diagnostics_Debug",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_Environment",
+    "Win32_System_EventLog",
+    "Win32_System_IO",
+    "Win32_System_JobObjects",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Memory",
+    "Win32_System_Pipes",
+    "Win32_System_Power",
+    "Win32_System_ProcessStatus",
+    "Win32_System_Registry",
+    "Win32_System_RemoteDesktop",
+    "Win32_System_Services",
+    "Win32_System_Shutdown",
+    "Win32_System_StationsAndDesktops",
+    "Win32_System_SystemInformation",
+    "Win32_System_SystemServices",
+    "Win32_System_Threading",
+    "Win32_System_Time",
+    "Win32_System_WindowsProgramming",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+# COM/WinRT projection, used ONLY for the Wi-Fi SSID lookup that works without
+# location permission (WlanConnectionProfileDetails.GetConnectedSsid / NLM).
+[dependencies.windows]
+version = "0.62"
+default-features = false
+features = [
+    "std",
+    "Foundation",
+    "Foundation_Collections",
+    "Networking_Connectivity",
+    "Win32_Networking_NetworkListManager",
+    "Win32_System_Com",
+    "Win32_System_WinRT",
+]
+
+[dev-dependencies]
+# Only used by examples/icongen.rs to compress PNG icon frames. Not linked into release binaries.
+miniz_oxide = "0.8"
+
+[profile.release]
+# "z": measured -232 KB service / -24 KB tray image and -0.2 MB working set vs "s"; the service is
+# I/O bound, so the slower code paths do not matter.
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+strip = true
+debug = false
+incremental = false
+panic = "unwind"   # keep unwind so one failing feature/thread cannot take the whole service down
+
+[profile.dev]
+debug = 1

@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build and publish, e.g. v1.0.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish the single-file release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+          components: clippy, rustfmt
+
+      - name: Build, lint and test (scripts/build.ps1)
+        shell: pwsh
+        run: ./scripts/build.ps1
+
+      - name: Check version matches the tag
+        shell: pwsh
+        run: |
+          $tag = '${{ github.event.inputs.tag || github.ref_name }}'
+          $exeVersion = (& ./dist/PredatorRemoteController.exe version) -replace '.*\s', ''
+          if ("v$exeVersion" -ne $tag) { throw "Tag $tag does not match the built version $exeVersion (Cargo.toml)." }
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: Predator Remote Controller ${{ github.event.inputs.tag || github.ref_name }}
+          body_path: .github/RELEASE_NOTES.md
+          files: |
+            dist/PredatorRemoteController.exe
+            dist/SHA256SUMS.txt
+          fail_on_unmatched_files: true
